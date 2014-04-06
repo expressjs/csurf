@@ -1,7 +1,7 @@
 {
   "name": "csurf",
   "description": "CSRF token middleware",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": {
     "name": "Jonathan Ong",
     "email": "me@jongleberry.com",
@@ -9,14 +9,7 @@
     "twitter": "https://twitter.com/jongleberry"
   },
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/expressjs/csurf.git"
-  },
-  "bugs": {
-    "mail": "me@jongleberry.com",
-    "url": "https://github.com/expressjs/csurf/issues"
-  },
+  "repository": "expressjs/csurf",
   "dependencies": {
     "uid2": "~0.0.2",
     "scmp": "~0.0.3"
