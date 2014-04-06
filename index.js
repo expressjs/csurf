@@ -10,6 +10,7 @@
 
 var uid = require('uid2');
 var crypto = require('crypto');
+var scmp = require('scmp');
 
 /**
  * Anti CSRF:
@@ -139,7 +140,7 @@ function createToken(salt, secret) {
 
 function checkToken(token, secret) {
   if ('string' != typeof token) return false;
-  return token === createToken(token.slice(0, 10), secret);
+  return scmp(token, createToken(token.slice(0, 10), secret));
 }
 
 /**

@@ -18,7 +18,8 @@
     "url": "https://github.com/expressjs/csurf/issues"
   },
   "dependencies": {
-    "uid2": "~0.0.2"
+    "uid2": "~0.0.2",
+    "scmp": "~0.0.3"
   },
   "devDependencies": {
     "cookie-session": "*",
