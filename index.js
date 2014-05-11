@@ -1,6 +1,7 @@
 /*!
  * Connect - csrf
  * Copyright(c) 2011 Sencha Inc.
+ * Copyright(c) 2014 Jonathan Ong
  * MIT Licensed
  */
 
