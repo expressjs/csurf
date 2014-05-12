@@ -17,6 +17,7 @@
   "devDependencies": {
     "cookie-session": "*",
     "body-parser": "*",
+    "cookie-parser": "*",
     "mocha": "^1.17.0",
     "should": "^3.0.0",
     "supertest": "*",

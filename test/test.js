@@ -1,12 +1,13 @@
 var connect = require('connect');
 var session = require('cookie-session');
 var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
 var request = require('supertest');
 
 var csrf = require('..');
 
 describe('csrf', function(){
-  it('should work with a valid token', function(done){
+  it('should work with a valid token (session-based)', function(done) {
     var app = trifecta();
 
     app.use(function(req, res){
@@ -31,7 +32,61 @@ describe('csrf', function(){
     });
   });
 
-  it('should fail with an invalid token', function(done){
+  it('should work with a valid token (cookie-based, defaults)', function(done) {
+    var app = trifecta(null, { cookie: true });
+
+    app.use(function(req, res) {
+      (req.session === undefined).should.be.true;
+      res.end(req.csrfToken() || 'none');
+    });
+
+    var server = app.listen();
+
+    request(server)
+    .get('/')
+    .end(function(err, res) {
+      var token = res.text;
+
+      request(server)
+      .post('/')
+      .set('Cookie', cookies(res))
+      .set('X-CSRF-Token', token)
+      .end(function(err, res) {
+        res.statusCode.should.equal(200)
+        done();
+      });
+    });
+  });
+
+  it('should work with a valid token (cookie-based, custom key)', function(done) {
+    var app = trifecta(null, { cookie: { key: '_customcsrf' } });
+
+    app.use(function(req, res) {
+      (req.session === undefined).should.be.true;
+      res.end(req.csrfToken() || 'none');
+    });
+
+    var server = app.listen();
+
+    request(server)
+    .get('/')
+    .end(function(err, res) {
+      var token = res.text;
+
+      res.headers['set-cookie'][0].split('=')[0].should.equal('_customcsrf');
+
+      request(server)
+      .post('/')
+      .set('Cookie', cookies(res))
+      .set('X-CSRF-Token', token)
+      .end(function(err, res) {
+        res.statusCode.should.equal(200)
+        done();
+      });
+    });
+  });
+
+  it('should fail with an invalid token', function(done) {
     var app = trifecta();
 
     app.use(function(req, res){
@@ -77,13 +132,16 @@ describe('csrf', function(){
   });
 });
 
-function trifecta(app) {
+function trifecta(app, opts) {
   app = app || connect();
-  app.use(session({
-    keys: ['a', 'b']
-  }));
+  if (!opts || (opts && !opts.cookie)) {
+    app.use(session({
+      keys: ['a', 'b']
+    }));
+  } else if (opts && opts.cookie)
+    app.use(cookieParser());
   app.use(bodyParser());
-  app.use(csrf());
+  app.use(csrf(opts));
   return app;
 }
 

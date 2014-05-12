@@ -28,18 +28,49 @@ var scmp = require('scmp');
 
 module.exports = function csrf(options) {
   options = options || {};
-  var value = options.value || defaultValue;
+  var value = options.value || defaultValue,
+      cookie = options.cookie,
+      cookieKey = (cookie && cookie.key) || '_csrf',
+      signedCookie = cookie && cookie.signed;
+
+  if (cookie && typeof cookie !== 'object')
+    cookie = {};
 
   return function(req, res, next){
 
     // already have one
-    var secret = req.session.csrfSecret;
+    var secret;
+    if (cookie) {
+      secret = (   (signedCookie
+                    && req.signedCookies
+                    && req.signedCookies[cookieKey])
+                || (!signedCookie
+                    && req.cookies
+                    && req.cookies[cookieKey])
+               );
+    } else if (req.session)
+      secret = req.session.csrfSecret;
+    else {
+      var err = new Error('misconfigured csrf');
+      err.status = 500;
+      next(err);
+      return;
+    }
     if (secret) return createToken(secret);
 
     // generate secret
     uid(24, function(err, secret){
       if (err) return next(err);
-      req.session.csrfSecret = secret;
+      if (cookie)
+        res.cookie(cookieKey, secret, cookie);
+      else if (req.session)
+        req.session.csrfSecret = secret;
+      else {
+        var err = new Error('misconfigured csrf');
+        err.status = 500;
+        next(err);
+        return;
+      }
       createToken(secret);
     });
 
