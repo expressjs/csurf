@@ -18,10 +18,13 @@
     "cookie-session": "*",
     "body-parser": "*",
     "cookie-parser": "*",
-    "mocha": "^1.17.0",
-    "should": "^3.0.0",
+    "mocha": ">= 1.17.0 < 2",
+    "should": ">= 3.0.0 < 4",
     "supertest": "*",
     "connect": "*"
+  },
+  "engines": {
+    "node": ">= 0.8.0"
   },
   "scripts": {
     "test": "make test"
