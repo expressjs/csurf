@@ -34,7 +34,7 @@ This middleware adds a `req.csrfToken()` function to make a token which should b
     - `key` the name of the cookie to use (defaults to `_csrf`) to store the csrf secret
     - any other [res.cookie](http://expressjs.com/4x/api.html#res.cookie) options can be set
 
-### req.crsfToken()
+### req.csrfToken()
 
 Lazy-loads the token associated with the request.
 
