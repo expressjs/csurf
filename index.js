@@ -6,14 +6,6 @@
  */
 
 /**
- * Module dependencies.
- */
-
-var uid = require('uid2');
-var crypto = require('crypto');
-var scmp = require('scmp');
-
-/**
  * CSRF protection middleware.
  *
  * This middleware adds a `req.csrfToken()` function to make a token
@@ -32,6 +24,8 @@ module.exports = function csrf(options) {
       cookie = options.cookie,
       cookieKey = (cookie && cookie.key) || '_csrf',
       signedCookie = cookie && cookie.signed;
+
+  var tokens = require('csrf-tokens')(options);
 
   if (cookie && typeof cookie !== 'object')
     cookie = {};
@@ -59,7 +53,7 @@ module.exports = function csrf(options) {
     if (secret) return createToken(secret);
 
     // generate secret
-    uid(24, function(err, secret){
+    tokens.secret(function(err, secret){
       if (err) return next(err);
       if (cookie)
         res.cookie(cookieKey, secret, cookie);
@@ -80,7 +74,7 @@ module.exports = function csrf(options) {
 
       // lazy-load token
       req.csrfToken = function csrfToken() {
-        return token || (token = saltedToken(secret));
+        return token || (token = tokens.create(secret));
       };
 
       // ignore these methods
@@ -90,7 +84,7 @@ module.exports = function csrf(options) {
       var val = value(req);
 
       // check
-      if (!checkToken(val, secret)) {
+      if (!val || !tokens.verify(secret, val)) {
         var err = new Error('invalid csrf token');
         err.status = 403;
         next(err);
@@ -117,63 +111,3 @@ function defaultValue(req) {
     || (req.headers['x-csrf-token'])
     || (req.headers['x-xsrf-token']);
 }
-
-/**
- * Return salted token.
- *
- * @param {String} secret
- * @return {String}
- * @api private
- */
-
-function saltedToken(secret) {
-  return createToken(generateSalt(10), secret);
-}
-
-/**
- * Creates a CSRF token from a given salt and secret.
- *
- * @param {String} salt (should be 10 characters)
- * @param {String} secret
- * @return {String}
- * @api private
- */
-
-function createToken(salt, secret) {
-  return salt + crypto
-    .createHash('sha1')
-    .update(salt + secret)
-    .digest('base64');
-}
-
-/**
- * Checks if a given CSRF token matches the given secret.
- *
- * @param {String} token
- * @param {String} secret
- * @return {Boolean}
- * @api private
- */
-
-function checkToken(token, secret) {
-  if ('string' != typeof token) return false;
-  return scmp(token, createToken(token.slice(0, 10), secret));
-}
-
-/**
- * Generates a random salt, using a fast non-blocking PRNG (Math.random()).
- *
- * @param {Number} length
- * @return {String}
- * @api private
- */
-
-function generateSalt(length) {
-  var i, r = [];
-  for (i = 0; i < length; ++i) {
-    r.push(SALTCHARS[Math.floor(Math.random() * SALTCHARS.length)]);
-  }
-  return r.join('');
-}
-
-var SALTCHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

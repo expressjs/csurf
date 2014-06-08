@@ -11,8 +11,7 @@
   "license": "MIT",
   "repository": "expressjs/csurf",
   "dependencies": {
-    "uid2": "~0.0.2",
-    "scmp": "~0.0.3"
+    "csrf-tokens": "~1.0.2"
   },
   "devDependencies": {
     "cookie-session": "*",
