@@ -60,7 +60,7 @@ module.exports = function csrf(options) {
       else if (req.session)
         req.session.csrfSecret = secret;
       else {
-        var err = new Error('misconfigured csrf');
+        err = new Error('misconfigured csrf');
         err.status = 500;
         next(err);
         return;
@@ -78,7 +78,7 @@ module.exports = function csrf(options) {
       };
 
       // ignore these methods
-      if ('GET' == req.method || 'HEAD' == req.method || 'OPTIONS' == req.method) return next();
+      if ('GET' === req.method || 'HEAD' === req.method || 'OPTIONS' === req.method) return next();
 
       // determine user-submitted value
       var val = value(req);
