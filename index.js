@@ -18,6 +18,12 @@
  * @api public
  */
 
+var ignoreMethod = {
+  GET: true,
+  HEAD: true,
+  OPTIONS: true,
+};
+
 module.exports = function csrf(options) {
   options = options || {};
   var value = options.value || defaultValue,
@@ -70,21 +76,17 @@ module.exports = function csrf(options) {
 
     // generate the token
     function createToken(secret) {
-      var token;
-
       // lazy-load token
+      var token;
       req.csrfToken = function csrfToken() {
         return token || (token = tokens.create(secret));
       };
 
       // ignore these methods
-      if ('GET' == req.method || 'HEAD' == req.method || 'OPTIONS' == req.method) return next();
+      if (ignoreMethod[req.method]) return next();
 
-      // determine user-submitted value
-      var val = value(req);
-
-      // check
-      if (!val || !tokens.verify(secret, val)) {
+      // check user-submitted value
+      if (!tokens.verify(secret, value(req))) {
         var err = new Error('invalid csrf token');
         err.status = 403;
         next(err);

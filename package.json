@@ -1,7 +1,7 @@
 {
   "name": "csurf",
   "description": "CSRF token middleware",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "author": {
     "name": "Jonathan Ong",
     "email": "me@jongleberry.com",
@@ -11,7 +11,7 @@
   "license": "MIT",
   "repository": "expressjs/csurf",
   "dependencies": {
-    "csrf-tokens": "~1.0.2"
+    "csrf-tokens": "~2.0.0"
   },
   "devDependencies": {
     "cookie-session": "*",
@@ -26,6 +26,6 @@
     "node": ">= 0.8.0"
   },
   "scripts": {
-    "test": "make test"
+    "test": "NODE_ENV=test mocha --reporter spec --require should"
   }
 }
