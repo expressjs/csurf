@@ -1,3 +1,6 @@
+
+process.env.NODE_ENV = 'test';
+
 var connect = require('connect');
 var session = require('cookie-session');
 var bodyParser = require('body-parser');
