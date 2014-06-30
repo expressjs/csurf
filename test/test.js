@@ -17,21 +17,17 @@ describe('csrf', function(){
       res.end(req.csrfToken() || 'none');
     });
 
-    var server = app.listen();
-
-    request(server)
+    request(app)
     .get('/')
-    .end(function(err, res){
+    .expect(200, function (err, res) {
+      if (err) return done(err)
       var token = res.text;
 
-      request(server)
+      request(app)
       .post('/')
       .set('Cookie', cookies(res))
       .set('X-CSRF-Token', token)
-      .end(function(err, res){
-        res.statusCode.should.equal(200)
-        done();
-      });
+      .expect(200, done)
     });
   });
 
@@ -43,21 +39,17 @@ describe('csrf', function(){
       res.end(req.csrfToken() || 'none');
     });
 
-    var server = app.listen();
-
-    request(server)
+    request(app)
     .get('/')
-    .end(function(err, res) {
+    .expect(200, function (err, res) {
+      if (err) return done(err)
       var token = res.text;
 
-      request(server)
+      request(app)
       .post('/')
       .set('Cookie', cookies(res))
       .set('X-CSRF-Token', token)
-      .end(function(err, res) {
-        res.statusCode.should.equal(200)
-        done();
-      });
+      .expect(200, done)
     });
   });
 
@@ -69,23 +61,19 @@ describe('csrf', function(){
       res.end(req.csrfToken() || 'none');
     });
 
-    var server = app.listen();
-
-    request(server)
+    request(app)
     .get('/')
-    .end(function(err, res) {
+    .expect(200, function (err, res) {
+      if (err) return done(err)
       var token = res.text;
 
       res.headers['set-cookie'][0].split('=')[0].should.equal('_customcsrf');
 
-      request(server)
+      request(app)
       .post('/')
       .set('Cookie', cookies(res))
       .set('X-CSRF-Token', token)
-      .end(function(err, res) {
-        res.statusCode.should.equal(200)
-        done();
-      });
+      .expect(200, done)
     });
   });
 
@@ -96,19 +84,15 @@ describe('csrf', function(){
       res.end(req.csrfToken() || 'none');
     });
 
-    var server = app.listen();
-
-    request(server)
+    request(app)
     .get('/')
-    .end(function(err, res){
-      request(server)
+    .expect(200, function (err, res) {
+      if (err) return done(err)
+      request(app)
       .post('/')
       .set('Cookie', cookies(res))
       .set('X-CSRF-Token', '42')
-      .end(function(err, res){
-        res.statusCode.should.equal(403)
-        done();
-      });
+      .expect(403, done)
     });
   });
 
@@ -119,18 +103,14 @@ describe('csrf', function(){
       res.end(req.csrfToken() || 'none');
     });
 
-    var server = app.listen();
-
-    request(server)
+    request(app)
     .get('/')
-    .end(function(err, res){
-      request(server)
+    .expect(200, function (err, res) {
+      if (err) return done(err)
+      request(app)
       .post('/')
       .set('Cookie', cookies(res))
-      .end(function(err, res){
-        res.statusCode.should.equal(403);
-        done();
-      });
+      .expect(403, done)
     });
   });
 });
