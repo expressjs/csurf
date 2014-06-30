@@ -6,6 +6,12 @@
  */
 
 /**
+ * Module dependencies.
+ */
+
+var csrfTokens = require('csrf-tokens');
+
+/**
  * CSRF protection middleware.
  *
  * This middleware adds a `req.csrfToken()` function to make a token
@@ -31,7 +37,7 @@ module.exports = function csrf(options) {
       cookieKey = (cookie && cookie.key) || '_csrf',
       signedCookie = cookie && cookie.signed;
 
-  var tokens = require('csrf-tokens')(options);
+  var tokens = csrfTokens(options);
 
   if (cookie && typeof cookie !== 'object')
     cookie = {};
