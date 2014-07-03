@@ -7,6 +7,7 @@ var session = require('cookie-session');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var request = require('supertest');
+var should = require('should')
 
 var csurf = require('..')
 

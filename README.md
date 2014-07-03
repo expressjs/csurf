@@ -1,4 +1,8 @@
-# csurf [![Build Status](https://travis-ci.org/expressjs/csurf.svg?branch=master)](https://travis-ci.org/expressjs/csurf) [![NPM Version](https://badge.fury.io/js/csurf.svg)](https://badge.fury.io/js/csurf)
+# csurf
+
+[![NPM Version](https://badge.fury.io/js/csurf.svg)](https://badge.fury.io/js/csurf)
+[![Build Status](https://travis-ci.org/expressjs/csurf.svg?branch=master)](https://travis-ci.org/expressjs/csurf)
+[![Coverage Status](https://img.shields.io/coveralls/expressjs/csurf.svg?branch=master)](https://coveralls.io/r/expressjs/csurf)
 
 Node.js [CSRF](https://en.wikipedia.org/wiki/Cross-site_request_forgery) protection middleware.
 
