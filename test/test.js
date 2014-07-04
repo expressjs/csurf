@@ -8,10 +8,78 @@ var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var request = require('supertest');
 var should = require('should')
+var url = require('url')
 
 var csurf = require('..')
 
 describe('csurf', function () {
+  it('should work in req.body', function(done) {
+    var server = createServer()
+
+    request(server)
+    .get('/')
+    .expect(200, function (err, res) {
+      if (err) return done(err)
+      var token = res.text;
+
+      request(server)
+      .post('/')
+      .set('Cookie', cookies(res))
+      .send('_csrf=' + encodeURIComponent(token))
+      .expect(200, done)
+    });
+  });
+
+  it('should work in req.query', function(done) {
+    var server = createServer()
+
+    request(server)
+    .get('/')
+    .expect(200, function (err, res) {
+      if (err) return done(err)
+      var token = res.text;
+
+      request(server)
+      .post('/?_csrf=' + encodeURIComponent(token))
+      .set('Cookie', cookies(res))
+      .expect(200, done)
+    });
+  });
+
+  it('should work in x-csrf-token header', function(done) {
+    var server = createServer()
+
+    request(server)
+    .get('/')
+    .expect(200, function (err, res) {
+      if (err) return done(err)
+      var token = res.text;
+
+      request(server)
+      .post('/')
+      .set('Cookie', cookies(res))
+      .set('x-csrf-token', token)
+      .expect(200, done)
+    });
+  });
+
+  it('should work in x-xsrf-token header', function(done) {
+    var server = createServer()
+
+    request(server)
+    .get('/')
+    .expect(200, function (err, res) {
+      if (err) return done(err)
+      var token = res.text;
+
+      request(server)
+      .post('/')
+      .set('Cookie', cookies(res))
+      .set('x-xsrf-token', token)
+      .expect(200, done)
+    });
+  });
+
   it('should work with a valid token (session-based)', function(done) {
     var server = createServer()
 
@@ -111,6 +179,16 @@ describe('csurf', function () {
     });
   });
 
+  it('should error without secret storage', function(done) {
+    var app = connect()
+
+    app.use(csurf())
+
+    request(app)
+    .get('/')
+    .expect(500, /misconfigured csrf/, done)
+  });
+
   it('should error without cookieParser secret and signed cookie storage', function(done) {
     var app = connect()
 
@@ -138,6 +216,10 @@ function createServer(opts) {
     app.use(cookieParser('keyboard cat'))
   }
 
+  app.use(function (req, res, next) {
+    req.query = url.parse(req.url, true).query
+    next()
+  })
   app.use(bodyParser())
   app.use(csurf(opts))
 

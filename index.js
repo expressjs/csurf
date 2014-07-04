@@ -85,13 +85,8 @@ module.exports = function csrf(options) {
         }
 
         setcookie(res, cookieKey, val, cookie);
-      } else if (req.session) {
-        req.session.csrfSecret = secret;
       } else {
-        var err = new Error('misconfigured csrf');
-        err.status = 500;
-        next(err);
-        return;
+        req.session.csrfSecret = secret;
       }
       createToken(secret);
     });
