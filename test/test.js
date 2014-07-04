@@ -65,6 +65,23 @@ describe('csurf', function () {
     });
   });
 
+  it('should work with a valid token (cookie-based, signed)', function(done) {
+    var server = createServer({ cookie: { signed: true } })
+
+    request(server)
+    .get('/')
+    .expect(200, function (err, res) {
+      if (err) return done(err)
+      var token = res.text;
+
+      request(server)
+      .post('/')
+      .set('Cookie', cookies(res))
+      .set('X-CSRF-Token', token)
+      .expect(200, done)
+    });
+  });
+
   it('should fail with an invalid token', function(done) {
     var server = createServer()
 
@@ -93,6 +110,17 @@ describe('csurf', function () {
       .expect(403, done)
     });
   });
+
+  it('should error without cookieParser secret and signed cookie storage', function(done) {
+    var app = connect()
+
+    app.use(cookieParser())
+    app.use(csurf({ cookie: { signed: true } }))
+
+    request(app)
+    .get('/')
+    .expect(500, /cookieParser.*secret/, done)
+  });
 });
 
 function cookies(req) {
@@ -107,7 +135,7 @@ function createServer(opts) {
   if (!opts || (opts && !opts.cookie)) {
     app.use(session({ keys: ['a', 'b'] }))
   } else if (opts && opts.cookie) {
-    app.use(cookieParser())
+    app.use(cookieParser('keyboard cat'))
   }
 
   app.use(bodyParser())

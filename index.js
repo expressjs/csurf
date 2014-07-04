@@ -9,7 +9,9 @@
  * Module dependencies.
  */
 
+var Cookie = require('cookie');
 var csrfTokens = require('csrf-tokens');
+var sign = require('cookie-signature').sign;
 
 /**
  * CSRF protection middleware.
@@ -67,11 +69,25 @@ module.exports = function csrf(options) {
     // generate secret
     tokens.secret(function(err, secret){
       if (err) return next(err);
-      if (cookie)
-        res.cookie(cookieKey, secret, cookie);
-      else if (req.session)
+      if (cookie) {
+        var cookieSecret = req.secret;
+        var val = secret;
+
+        if (signedCookie) {
+          if (!cookieSecret) {
+            var err = new Error('cookieParser("secret") required for signed cookies');
+            err.status = 500;
+            next(err);
+            return;
+          }
+
+          val = 's:' + sign(secret, cookieSecret);
+        }
+
+        setcookie(res, cookieKey, val, cookie);
+      } else if (req.session) {
         req.session.csrfSecret = secret;
-      else {
+      } else {
         var err = new Error('misconfigured csrf');
         err.status = 500;
         next(err);
@@ -118,4 +134,25 @@ function defaultValue(req) {
     || (req.query && req.query._csrf)
     || (req.headers['x-csrf-token'])
     || (req.headers['x-xsrf-token']);
+}
+
+/**
+ * Set a cookie on the HTTP response.
+ *
+ * @param {OutgoingMessage} res
+ * @param {string} name
+ * @param {string} val
+ * @param {Object} [options]
+ * @api private
+ */
+
+function setcookie(res, name, val, options) {
+  var data = Cookie.serialize(name, val, options);
+
+  var prev = res.getHeader('set-cookie') || [];
+  var header = Array.isArray(prev) ? prev.concat(data)
+    : Array.isArray(data) ? [prev].concat(data)
+    : [prev, data];
+
+  res.setHeader('set-cookie', header);
 }
