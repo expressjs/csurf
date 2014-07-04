@@ -1,5 +1,5 @@
-unreleased
-==========
+1.3.0 / 2014-07-03
+==================
 
  * add support for environments without `res.cookie` (connect@3)
 
