@@ -80,23 +80,6 @@ describe('csurf', function () {
     });
   });
 
-  it('should work with a valid token (session-based)', function(done) {
-    var server = createServer()
-
-    request(server)
-    .get('/')
-    .expect(200, function (err, res) {
-      if (err) return done(err)
-      var token = res.text;
-
-      request(server)
-      .post('/')
-      .set('Cookie', cookies(res))
-      .set('X-CSRF-Token', token)
-      .expect(200, done)
-    });
-  });
-
   it('should work with a valid token (cookie-based, defaults)', function(done) {
     var server = createServer({ cookie: true })
 
@@ -199,6 +182,79 @@ describe('csurf', function () {
     .get('/')
     .expect(500, /cookieParser.*secret/, done)
   });
+
+  describe('req.csrfToken()', function () {
+    it('should return same token for each call', function (done) {
+      var app = connect()
+      app.use(session({ keys: ['a', 'b'] }))
+      app.use(csurf())
+      app.use(function (req, res) {
+        var token1 = req.csrfToken()
+        var token2 = req.csrfToken()
+        res.end(String(token1 === token2))
+      })
+
+      request(app)
+      .get('/')
+      .expect(200, 'true', done)
+    })
+  })
+
+  describe('when using session storage', function () {
+    var app
+    before(function () {
+      app = connect()
+      app.use(session({ keys: ['a', 'b'] }))
+      app.use(csurf())
+      app.use('/break', function (req, res, next) {
+        // break session
+        req.session = null
+        next()
+      })
+      app.use('/new', function (req, res, next) {
+        // regenerate session
+        req.session = {hit: 1}
+        next()
+      })
+      app.use(function (req, res) {
+        res.end(req.csrfToken() || 'none')
+      })
+    })
+
+    it('should work with a valid token', function(done) {
+      request(app)
+      .get('/')
+      .expect(200, function (err, res) {
+        if (err) return done(err)
+        var token = res.text
+        request(app)
+        .post('/')
+        .set('Cookie', cookies(res))
+        .set('X-CSRF-Token', token)
+        .expect(200, done)
+      })
+    })
+
+    it('should provide a valid token when session regenerated', function(done) {
+      request(app)
+      .get('/new')
+      .expect(200, function (err, res) {
+        if (err) return done(err)
+        var token = res.text
+        request(app)
+        .post('/')
+        .set('Cookie', cookies(res))
+        .set('X-CSRF-Token', token)
+        .expect(200, done)
+      })
+    })
+
+    it('should error if session missing', function(done) {
+      request(app)
+      .get('/break')
+      .expect(500, /misconfigured csrf/, done)
+    })
+  })
 });
 
 function cookies(req) {

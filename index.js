@@ -52,7 +52,28 @@ module.exports = function csurf(options) {
 
     // lazy-load token getter
     req.csrfToken = function csrfToken() {
-      return token || (token = tokens.create(secret))
+      var sec = !options.cookie
+        ? getsecret(req, options.cookie)
+        : secret
+
+      // use cached token if secret has not changed
+      if (token && sec === secret) {
+        return token
+      }
+
+      // generate & set new secret
+      if (sec === undefined) {
+        sec = tokens.secretSync()
+        setsecret(req, res, sec, options.cookie)
+      }
+
+      // update changed secret
+      secret = sec
+
+      // create new token
+      token = tokens.create(secret)
+
+      return token
     }
 
     // generate & set secret
@@ -161,6 +182,7 @@ function setsecret(req, res, val, cookie) {
     // set secret on session
     req.session.csrfSecret = val
   } else {
+    /* istanbul ignore next: should never actually run */
     throw new Error('misconfigured csrf')
   }
 }

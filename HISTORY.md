@@ -1,3 +1,9 @@
+unreleased
+==========
+
+ * Support changing `req.session` after `csurf` middleware
+   - Calling `res.csrfToken()` after `req.session.destroy()` will now work
+
 1.3.0 / 2014-07-03
 ==================
 
