@@ -1,5 +1,5 @@
 /*!
- * Expressjs | Connect - csrf
+ * csurf
  * Copyright(c) 2011 Sencha Inc.
  * Copyright(c) 2014 Jonathan Ong
  * MIT Licensed
@@ -32,86 +32,39 @@ var ignoreMethod = {
   OPTIONS: true,
 };
 
-module.exports = function csrf(options) {
+module.exports = function csurf(options) {
   options = options || {};
-  var value = options.value || defaultValue,
-      cookie = options.cookie,
-      cookieKey = (cookie && cookie.key) || '_csrf',
-      signedCookie = cookie && cookie.signed;
 
+  // get value getter
+  var value = options.value || defaultValue
+
+  // token repo
   var tokens = csrfTokens(options);
 
-  if (cookie && typeof cookie !== 'object')
-    cookie = {};
+  // default cookie key
+  if (options.cookie && !options.cookie.key) {
+    options.cookie.key = '_csrf'
+  }
 
-  return function(req, res, next){
+  return function csrf(req, res, next) {
+    var secret = getsecret(req, options.cookie)
+    var token
 
-    // already have one
-    var secret;
-    if (cookie) {
-      secret = (   (signedCookie
-                    && req.signedCookies
-                    && req.signedCookies[cookieKey])
-                || (!signedCookie
-                    && req.cookies
-                    && req.cookies[cookieKey])
-               );
-    } else if (req.session)
-      secret = req.session.csrfSecret;
-    else {
-      var err = new Error('misconfigured csrf');
-      err.status = 500;
-      next(err);
-      return;
+    // lazy-load token getter
+    req.csrfToken = function csrfToken() {
+      return token || (token = tokens.create(secret))
     }
-    if (secret) return createToken(secret);
 
-    // generate secret
-    tokens.secret(function(err, secret){
-      if (err) return next(err);
-      if (cookie) {
-        var cookieSecret = req.secret;
-        var val = secret;
-
-        if (signedCookie) {
-          if (!cookieSecret) {
-            var err = new Error('cookieParser("secret") required for signed cookies');
-            err.status = 500;
-            next(err);
-            return;
-          }
-
-          val = 's:' + sign(secret, cookieSecret);
-        }
-
-        setcookie(res, cookieKey, val, cookie);
-      } else {
-        req.session.csrfSecret = secret;
-      }
-      createToken(secret);
-    });
-
-    // generate the token
-    function createToken(secret) {
-      // lazy-load token
-      var token;
-      req.csrfToken = function csrfToken() {
-        return token || (token = tokens.create(secret));
-      };
-
-      // ignore these methods
-      if (ignoreMethod[req.method]) return next();
-
-      // check user-submitted value
-      if (!tokens.verify(secret, value(req))) {
-        var err = new Error('invalid csrf token');
-        err.status = 403;
-        next(err);
-        return;
-      }
-
-      next();
+    // generate & set secret
+    if (!secret) {
+      secret = tokens.secretSync()
+      setsecret(req, res, secret, options.cookie)
     }
+
+    // verify the incoming token
+    verifytoken(req, tokens, secret, value(req))
+
+    next()
   }
 };
 
@@ -129,6 +82,34 @@ function defaultValue(req) {
     || (req.query && req.query._csrf)
     || (req.headers['x-csrf-token'])
     || (req.headers['x-xsrf-token']);
+}
+
+/**
+ * Get the token secret from the request.
+ *
+ * @param {IncomingMessage} req
+ * @param {Object} [cookie]
+ * @api private
+ */
+
+function getsecret(req, cookie) {
+  var secret
+
+  if (cookie) {
+    // get secret from cookie
+    var bag = cookie.signed
+      ? 'signedCookies'
+      : 'cookies'
+
+    secret = req[bag][cookie.key]
+  } else if (req.session) {
+    // get secret from session
+    secret = req.session.csrfSecret
+  } else {
+    throw new Error('misconfigured csrf')
+  }
+
+  return secret
 }
 
 /**
@@ -150,4 +131,62 @@ function setcookie(res, name, val, options) {
     : [prev, data];
 
   res.setHeader('set-cookie', header);
+}
+
+/**
+ * Set the token secret on the request.
+ *
+ * @param {IncomingMessage} req
+ * @param {OutgoingMessage} res
+ * @param {string} val
+ * @param {Object} [cookie]
+ * @api private
+ */
+
+function setsecret(req, res, val, cookie) {
+  if (cookie) {
+    // set secret on cookie
+    if (cookie.signed) {
+      var secret = req.secret
+
+      if (!secret) {
+        throw new Error('cookieParser("secret") required for signed cookies')
+      }
+
+      val = 's:' + sign(val, secret)
+    }
+
+    setcookie(res, cookie.key, val, cookie);
+  } else if (req.session) {
+    // set secret on session
+    req.session.csrfSecret = val
+  } else {
+    throw new Error('misconfigured csrf')
+  }
+}
+
+/**
+ * Verify the token.
+ *
+ * @param {IncomingMessage} req
+ * @param {Object} tokens
+ * @param {string} secret
+ * @param {string} val
+ * @api private
+ */
+
+function verifytoken(req, tokens, secret, val) {
+  // ignore these methods
+  if (ignoreMethod[req.method]) {
+    return
+  }
+
+  // valid token
+  if (tokens.verify(secret, val)) {
+    return
+  }
+
+  var err = new Error('invalid csrf token')
+  err.status = 403
+  throw err
 }
