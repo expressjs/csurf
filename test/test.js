@@ -276,7 +276,7 @@ function createServer(opts) {
     req.query = url.parse(req.url, true).query
     next()
   })
-  app.use(bodyParser())
+  app.use(bodyParser.urlencoded({extended: false}))
   app.use(csurf(opts))
 
   app.use(function (req, res) {
