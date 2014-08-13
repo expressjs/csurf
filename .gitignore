@@ -65,3 +65,8 @@ npm-debug.log
 
 /build
 /components
+
+# IDE-s #
+#########
+
+/.idea

@@ -53,7 +53,7 @@ var app = express()
 app.use(csrf())
  ...
 app.use(function(err,req,res,next) {
-  if (err.status === 403 && err.name === 'CSRF_Error') { /* do-something-special */ }
+  if (err.status === 403 && err.code === 'ECSRFTOKENINVALID') { /* do-something-special */ }
   /* handle other errors */
   })
   

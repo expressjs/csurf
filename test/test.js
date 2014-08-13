@@ -146,7 +146,7 @@ describe('csurf', function () {
       .set('Cookie', cookies(res))
       .set('X-CSRF-Token', '42')
       .expect(403, function() {
-        thrownError.name.should.equal('CSRF_Error')
+        thrownError.code.should.equal('ECSRFTOKENINVALID')
         done()
       })
     });
@@ -163,7 +163,7 @@ describe('csurf', function () {
       .post('/')
       .set('Cookie', cookies(res))
       .expect(403, function() {
-        thrownError.name.should.equal('CSRF_Error')
+        thrownError.code.should.equal('ECSRFTOKENINVALID')
         done()
       })
     });

@@ -210,6 +210,6 @@ function verifytoken(req, tokens, secret, val) {
 
   var err = new Error('invalid csrf token')
   err.status = 403
-  err.name = 'CSRF_Error'
+  err.code = 'ECSRFTOKENINVALID'
   throw err
 }
