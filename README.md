@@ -25,6 +25,7 @@ var csrf = require('csurf')
 ### csrf(options)
 
 This middleware adds a `req.csrfToken()` function to make a token which should be added to requests which mutate state, within a hidden form field, query-string etc. This token is validated against the visitor's session or csrf cookie.
+If validation fails, an error will be thrown
 
 #### Options
 
@@ -50,6 +51,12 @@ var csrf    = require('csurf')
 
 var app = express()
 app.use(csrf())
+ ...
+app.use(function(err,req,res,next) {
+  if (err.status === 403 && err.name === 'CSRF_Error') { /* do-something-special */ }
+  /* handle other errors */
+  })
+  
 ```
 
 ## License
