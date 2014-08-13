@@ -162,6 +162,33 @@ describe('csurf', function () {
     });
   });
 
+  it('should provide error code on invalid token error', function(done){
+    var app = connect()
+    app.use(session({ keys: ['a', 'b'] }))
+    app.use(csurf())
+
+    app.use(function (req, res) {
+      res.end(req.csrfToken() || 'none')
+    })
+
+    app.use(function (err, req, res, next) {
+      if (err.code !== 'EBADCSRFTOKEN') return next(err)
+      res.statusCode = 403
+      res.end('session has expired or form tampered with')
+    })
+
+    request(app)
+    .get('/')
+    .expect(200, function (err, res) {
+      if (err) return done(err)
+      request(app)
+      .post('/')
+      .set('Cookie', cookies(res))
+      .set('X-CSRF-Token', String(res.text + 'p'))
+      .expect(403, 'session has expired or form tampered with', done)
+    });
+  });
+
   it('should error without secret storage', function(done) {
     var app = connect()
 
