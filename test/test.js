@@ -11,6 +11,7 @@ var should = require('should')
 var url = require('url')
 
 var csurf = require('..')
+var thrownError;
 
 describe('csurf', function () {
   it('should work in req.body', function(done) {
@@ -144,7 +145,10 @@ describe('csurf', function () {
       .post('/')
       .set('Cookie', cookies(res))
       .set('X-CSRF-Token', '42')
-      .expect(403, done)
+      .expect(403, function() {
+        thrownError.code.should.equal('ECSRFTOKENINVALID')
+        done()
+      })
     });
   });
 
@@ -158,7 +162,10 @@ describe('csurf', function () {
       request(server)
       .post('/')
       .set('Cookie', cookies(res))
-      .expect(403, done)
+      .expect(403, function() {
+        thrownError.code.should.equal('ECSRFTOKENINVALID')
+        done()
+      })
     });
   });
 
@@ -279,7 +286,12 @@ function createServer(opts) {
   app.use(bodyParser.urlencoded({extended: false}))
   app.use(csurf(opts))
 
-  app.use(function (req, res) {
+  app.use(function (err, req, res, next) {
+    thrownError = err
+    next(err)
+  })
+
+  app.use(function (req, res, next) {
     res.end(req.csrfToken() || 'none')
   })
 
