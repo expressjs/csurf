@@ -10,7 +10,7 @@
  */
 
 var Cookie = require('cookie');
-var csrfTokens = require('csrf-tokens');
+var csrfTokens = require('csrf');
 var sign = require('cookie-signature').sign;
 
 /**

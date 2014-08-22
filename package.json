@@ -11,7 +11,7 @@
   "dependencies": {
     "cookie": "0.1.2",
     "cookie-signature": "1.0.4",
-    "csrf-tokens": "~2.0.0"
+    "csrf": "~2.0.1"
   },
   "devDependencies": {
     "body-parser": "~1.5.2",
@@ -30,5 +30,12 @@
     "test": "mocha --check-leaks --reporter spec --bail test/",
     "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --check-leaks --reporter dot test/",
     "test-travis": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --check-leaks --reporter spec test/"
-  }
+  },
+  "files": ["index.js"],
+  "keywords": [
+    "csrf",
+    "tokens",
+    "middleware",
+    "express"
+  ]
 }

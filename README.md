@@ -1,8 +1,11 @@
 # csurf
 
-[![NPM Version](https://badge.fury.io/js/csurf.svg)](https://badge.fury.io/js/csurf)
-[![Build Status](https://travis-ci.org/expressjs/csurf.svg?branch=master)](https://travis-ci.org/expressjs/csurf)
-[![Coverage Status](https://img.shields.io/coveralls/expressjs/csurf.svg?branch=master)](https://coveralls.io/r/expressjs/csurf)
+[![NPM version][npm-image]][npm-url]
+[![Build status][travis-image]][travis-url]
+[![Test coverage][coveralls-image]][coveralls-url]
+[![Dependency Status][david-image]][david-url]
+[![License][license-image]][license-url]
+[![Downloads][downloads-image]][downloads-url]
 
 Node.js [CSRF](https://en.wikipedia.org/wiki/Cross-site_request_forgery) protection middleware.
 
@@ -55,3 +58,18 @@ app.use(csrf())
 ## License
 
 [MIT](LICENSE)
+
+[npm-image]: https://img.shields.io/npm/v/csurf.svg?style=flat-square
+[npm-url]: https://npmjs.org/package/csurf
+[github-tag]: http://img.shields.io/github/tag/expressjs/csurf.svg?style=flat-square
+[github-url]: https://github.com/expressjs/csurf/tags
+[travis-image]: https://img.shields.io/travis/expressjs/csurf.svg?style=flat-square
+[travis-url]: https://travis-ci.org/expressjs/csurf
+[coveralls-image]: https://img.shields.io/coveralls/expressjs/csurf.svg?style=flat-square
+[coveralls-url]: https://coveralls.io/r/expressjs/csurf?branch=master
+[david-image]: http://img.shields.io/david/expressjs/csurf.svg?style=flat-square
+[david-url]: https://david-dm.org/expressjs/csurf
+[license-image]: http://img.shields.io/npm/l/csurf.svg?style=flat-square
+[license-url]: LICENSE
+[downloads-image]: http://img.shields.io/npm/dm/csurf.svg?style=flat-square
+[downloads-url]: https://npmjs.org/package/csurf
