@@ -31,7 +31,11 @@
     "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --check-leaks --reporter dot test/",
     "test-travis": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --check-leaks --reporter spec test/"
   },
-  "files": ["index.js"],
+  "files": [
+    "HISTORY.md",
+    "LICENSE",
+    "index.js"
+  ],
   "keywords": [
     "csrf",
     "tokens",
