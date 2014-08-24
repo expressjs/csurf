@@ -183,6 +183,22 @@ describe('csurf', function () {
     .expect(500, /cookieParser.*secret/, done)
   });
 
+  it('should check GET when explicitly restricted', function(done) {
+    var server = createServer({ignoreMethod: {GET: false}});
+
+    request(server)
+    .get('/')
+    .expect(403, done);
+  });
+
+  it('should not check POST when explicitly allowed', function(done) {
+    var server = createServer({ignoreMethod: {POST: true}});
+
+    request(server)
+    .post('/')
+    .expect(200, done);
+  });
+
   describe('req.csrfToken()', function () {
     it('should return same token for each call', function (done) {
       var app = connect()
