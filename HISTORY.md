@@ -1,5 +1,5 @@
-unreleased
-==========
+1.5.0 / 2014-08-24
+==================
 
  * add `ignoreMethods` option
 
