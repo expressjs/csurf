@@ -2,6 +2,7 @@
  * csurf
  * Copyright(c) 2011 Sencha Inc.
  * Copyright(c) 2014 Jonathan Ong
+ * Copyright(c) 2014 Douglas Christopher Wilson
  * MIT Licensed
  */
 
@@ -26,12 +27,6 @@ var sign = require('cookie-signature').sign;
  * @api public
  */
 
-var ignoreMethod = {
-  GET: true,
-  HEAD: true,
-  OPTIONS: true,
-};
-
 module.exports = function csurf(options) {
   options = options || {};
 
@@ -45,6 +40,18 @@ module.exports = function csurf(options) {
   if (options.cookie && !options.cookie.key) {
     options.cookie.key = '_csrf'
   }
+
+  // ignored methods
+  var ignoreMethods = options.ignoreMethods === undefined
+    ? ['GET', 'HEAD', 'OPTIONS']
+    : options.ignoreMethods
+
+  if (!Array.isArray(ignoreMethods)) {
+    throw new TypeError('option ignoreMethods must be an array')
+  }
+
+  // generate lookup
+  var ignoreMethod = getIgnoredMethods(ignoreMethods)
 
   return function csrf(req, res, next) {
     var secret = getsecret(req, options.cookie)
@@ -83,7 +90,9 @@ module.exports = function csurf(options) {
     }
 
     // verify the incoming token
-    verifytoken(req, tokens, secret, value(req))
+    if (!ignoreMethod[req.method]) {
+      verifytoken(req, tokens, secret, value(req))
+    }
 
     next()
   }
@@ -103,6 +112,25 @@ function defaultValue(req) {
     || (req.query && req.query._csrf)
     || (req.headers['x-csrf-token'])
     || (req.headers['x-xsrf-token']);
+}
+
+/**
+ * Get a lookup of ignored methods.
+ *
+ * @param {array} methods
+ * @returns {object}
+ * @api private
+ */
+
+function getIgnoredMethods(methods) {
+  var obj = Object.create(null)
+
+  for (var i = 0; i < methods.length; i++) {
+    var method = methods[i].toUpperCase()
+    obj[method] = true
+  }
+
+  return obj
 }
 
 /**
@@ -198,11 +226,6 @@ function setsecret(req, res, val, cookie) {
  */
 
 function verifytoken(req, tokens, secret, val) {
-  // ignore these methods
-  if (ignoreMethod[req.method]) {
-    return
-  }
-
   // valid token
   if (tokens.verify(secret, val)) {
     return

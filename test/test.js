@@ -183,6 +183,33 @@ describe('csurf', function () {
     .expect(500, /cookieParser.*secret/, done)
   });
 
+  describe('with "ignoreMethods" option', function () {
+    it('should reject invalid value', function () {
+      createServer.bind(null, {ignoreMethods: 'tj'}).should.throw(/option ignoreMethods/)
+    })
+
+    it('should not check token on given methods', function (done) {
+      var server = createServer({ignoreMethods: ['GET', 'POST']})
+
+      request(server)
+      .get('/')
+      .expect(200, function (err, res) {
+        if (err) return done(err)
+        var cookie = cookies(res)
+        request(server)
+        .post('/')
+        .set('Cookie', cookie)
+        .expect(200, function (err, res) {
+          if (err) return done(err)
+          request(server)
+          .put('/')
+          .set('Cookie', cookie)
+          .expect(403, done)
+        })
+      })
+    })
+  })
+
   describe('req.csrfToken()', function () {
     it('should return same token for each call', function (done) {
       var app = connect()

@@ -38,6 +38,8 @@ This middleware adds a `req.csrfToken()` function to make a token which should b
   - If `cookie` is an object, these options can be configured, otherwise defaults are used:
     - `key` the name of the cookie to use (defaults to `_csrf`) to store the csrf secret
     - any other [res.cookie](http://expressjs.com/4x/api.html#res.cookie) options can be set
+- `ignoreMethods` An array of the methods CSRF token checking will disabled.
+  (default: `['GET', 'HEAD', 'OPTIONS']`)
 
 ### req.csrfToken()
 

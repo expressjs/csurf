@@ -1,3 +1,7 @@
+unreleased
+==========
+
+ * add `ignoreMethods` option
 
 1.4.1 / 2014-08-22
 ==================
