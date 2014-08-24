@@ -12,6 +12,7 @@
 var Cookie = require('cookie');
 var csrfTokens = require('csrf');
 var sign = require('cookie-signature').sign;
+var extend = require('extend');
 
 /**
  * CSRF protection middleware.
@@ -26,7 +27,7 @@ var sign = require('cookie-signature').sign;
  * @api public
  */
 
-var ignoreMethod = {
+var ignoreMethodDefaults = {
   GET: true,
   HEAD: true,
   OPTIONS: true,
@@ -45,6 +46,9 @@ module.exports = function csurf(options) {
   if (options.cookie && !options.cookie.key) {
     options.cookie.key = '_csrf'
   }
+
+  // Allow user to define HTTP methods to ignore
+  var ignoreMethod = extend({}, ignoreMethodDefaults, options && options.ignoreMethod)
 
   return function csrf(req, res, next) {
     var secret = getsecret(req, options.cookie)
@@ -83,7 +87,7 @@ module.exports = function csurf(options) {
     }
 
     // verify the incoming token
-    verifytoken(req, tokens, secret, value(req))
+    verifytoken(req, tokens, secret, value(req), ignoreMethod)
 
     next()
   }
@@ -197,7 +201,7 @@ function setsecret(req, res, val, cookie) {
  * @api private
  */
 
-function verifytoken(req, tokens, secret, val) {
+function verifytoken(req, tokens, secret, val, ignoreMethod) {
   // ignore these methods
   if (ignoreMethod[req.method]) {
     return
