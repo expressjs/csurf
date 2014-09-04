@@ -74,5 +74,5 @@ app.use(function (err, req, res, next) {
 [travis-url]: https://travis-ci.org/expressjs/csurf
 [coveralls-image]: https://img.shields.io/coveralls/expressjs/csurf.svg?style=flat
 [coveralls-url]: https://coveralls.io/r/expressjs/csurf?branch=master
-[downloads-image]: http://img.shields.io/npm/dm/csurf.svg?style=flat
+[downloads-image]: https://img.shields.io/npm/dm/csurf.svg?style=flat
 [downloads-url]: https://npmjs.org/package/csurf
