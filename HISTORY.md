@@ -1,5 +1,5 @@
-unreleased
-==========
+1.6.0 / 2014-09-03
+==================
 
  * set `code` property on CSRF token errors
 
