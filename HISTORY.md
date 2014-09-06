@@ -1,3 +1,8 @@
+unreleased
+==========
+
+ * bump cookie-signature
+
 1.6.0 / 2014-09-03
 ==================
 

@@ -10,7 +10,7 @@
   "repository": "expressjs/csurf",
   "dependencies": {
     "cookie": "0.1.2",
-    "cookie-signature": "1.0.4",
+    "cookie-signature": "1.0.5",
     "csrf": "~2.0.1"
   },
   "devDependencies": {
