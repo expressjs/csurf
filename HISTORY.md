@@ -1,5 +1,5 @@
-unreleased
-==========
+1.6.1 / 2014-09-05
+==================
 
  * bump cookie-signature
 
