@@ -12,6 +12,7 @@
 
 var Cookie = require('cookie');
 var csrfTokens = require('csrf');
+var createError = require('http-errors');
 var sign = require('cookie-signature').sign;
 
 /**
@@ -227,12 +228,9 @@ function setsecret(req, res, val, cookie) {
 
 function verifytoken(req, tokens, secret, val) {
   // valid token
-  if (tokens.verify(secret, val)) {
-    return
+  if (!tokens.verify(secret, val)) {
+    throw createError(403, 'invalid csrf token', {
+      code: 'EBADCSRFTOKEN'
+    });
   }
-
-  var err = new Error('invalid csrf token')
-  err.status = 403
-  err.code = 'EBADCSRFTOKEN'
-  throw err
 }

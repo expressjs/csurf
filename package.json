@@ -11,7 +11,8 @@
   "dependencies": {
     "cookie": "0.1.2",
     "cookie-signature": "1.0.5",
-    "csrf": "~2.0.1"
+    "csrf": "~2.0.1",
+    "http-errors": "~1.2.0"
   },
   "devDependencies": {
     "body-parser": "~1.8.0",
