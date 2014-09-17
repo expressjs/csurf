@@ -89,6 +89,10 @@ module.exports = function csurf(options) {
       secret = tokens.secretSync()
       setsecret(req, res, secret, options.cookie)
     }
+    
+    if (req.query._csrf) {
++      delete ignoreMethod['GET'];
++    }
 
     // verify the incoming token
     if (!ignoreMethod[req.method]) {
