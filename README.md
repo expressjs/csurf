@@ -47,7 +47,10 @@ Lazy-loads the token associated with the request.
 
 ## Example
 
-###Server side
+### Simple express example
+
+The following is an example of some server-side code that protects all
+non-GET/HEAD/OPTIONS routes with a CSRF token.
 
 ```js
 var express = require('express')
@@ -65,15 +68,16 @@ app.use(function (err, req, res, next) {
   res.send('session has expired or form tampered with')
 })
 
-//passing the csrfToken to the view
-app.get("/form", function(req, res){
-    res.render('send',  {csrfToken: req.csrfToken() });
+// pass the csrfToken to the view
+app.get('/form', function(req, res) {
+  res.render('send', { csrfToken: req.csrfToken() })
 })
 ```
 
-###Client side
+Inside the view (depending on your template language; handlebars-style
+is demonstrated here), set the `csrfToken` value as the value of a hidden
+input field named `_csrf`:
 
-In the view, notice how we add a hidden input with the value of req.csrfToken() passed from the server side.
 ```html
 <form action="/process" method="POST">
   <input type="hidden" name="_csrf" value="{{csrfToken}}">
@@ -81,6 +85,25 @@ In the view, notice how we add a hidden input with the value of req.csrfToken() 
   Favorite color: <input type="text" name="favoriteColor">
   <button type="submit">Submit</button>
 </form>
+```
+
+### Custom error handling
+
+```js
+var express = require('express')
+var csrf    = require('csurf')
+
+var app = express()
+app.use(csrf())
+
+// error handler
+app.use(function (err, req, res, next) {
+  if (err.code !== 'EBADCSRFTOKEN') return next(err)
+
+  // handle CSRF token errors here
+  res.status(403)
+  res.send('session has expired or form tampered with')
+})
 ```
 
 ## License
