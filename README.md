@@ -47,6 +47,8 @@ Lazy-loads the token associated with the request.
 
 ## Example
 
+###Server side
+
 ```js
 var express = require('express')
 var csrf    = require('csurf')
@@ -62,6 +64,23 @@ app.use(function (err, req, res, next) {
   res.status(403)
   res.send('session has expired or form tampered with')
 })
+
+//passing the csrfToken to the view
+app.get("/form", function(req, res){
+    res.render('send',  {csrfToken: req.csrfToken() });
+})
+```
+
+###Client side
+
+In the view, notice how we add a hidden input with the value of req.csrfToken() passed from the server side.
+```html
+<form action="/process" method="POST">
+  <input type="hidden" name="_csrf" value="{{csrfToken}}">
+  
+  Favorite color: <input type="text" name="favoriteColor">
+  <button type="submit">Submit</button>
+</form>
 ```
 
 ## License
