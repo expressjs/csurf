@@ -82,6 +82,7 @@ In the view, notice how we add a hidden input with the value of req.csrfToken() 
   <button type="submit">Submit</button>
 </form>
 ```
+In this case we are using the `req.body` location.
 
 ## License
 
