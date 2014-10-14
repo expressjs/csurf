@@ -89,6 +89,8 @@ describe('csurf', function () {
       if (err) return done(err)
       var token = res.text;
 
+      res.headers['set-cookie'][0].split('=')[0].should.equal('_csrf');
+
       request(server)
       .post('/')
       .set('Cookie', cookies(res))

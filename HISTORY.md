@@ -2,6 +2,7 @@ unreleased
 ==========
 
  * bump http-errors
+ * fix cookie name when using `cookie: true`
 
 1.6.1 / 2014-09-05
 ==================

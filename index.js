@@ -31,6 +31,11 @@ var sign = require('cookie-signature').sign;
 module.exports = function csurf(options) {
   options = options || {};
 
+  // get cookie options
+  var cookie = options.cookie !== true
+    ? options.cookie || undefined
+    : {}
+
   // get value getter
   var value = options.value || defaultValue
 
@@ -38,8 +43,8 @@ module.exports = function csurf(options) {
   var tokens = csrfTokens(options);
 
   // default cookie key
-  if (options.cookie && !options.cookie.key) {
-    options.cookie.key = '_csrf'
+  if (cookie && !cookie.key) {
+    cookie.key = '_csrf'
   }
 
   // ignored methods
@@ -55,13 +60,13 @@ module.exports = function csurf(options) {
   var ignoreMethod = getIgnoredMethods(ignoreMethods)
 
   return function csrf(req, res, next) {
-    var secret = getsecret(req, options.cookie)
+    var secret = getsecret(req, cookie)
     var token
 
     // lazy-load token getter
     req.csrfToken = function csrfToken() {
-      var sec = !options.cookie
-        ? getsecret(req, options.cookie)
+      var sec = !cookie
+        ? getsecret(req, cookie)
         : secret
 
       // use cached token if secret has not changed
@@ -72,7 +77,7 @@ module.exports = function csurf(options) {
       // generate & set new secret
       if (sec === undefined) {
         sec = tokens.secretSync()
-        setsecret(req, res, sec, options.cookie)
+        setsecret(req, res, sec, cookie)
       }
 
       // update changed secret
@@ -87,7 +92,7 @@ module.exports = function csurf(options) {
     // generate & set secret
     if (!secret) {
       secret = tokens.secretSync()
-      setsecret(req, res, secret, options.cookie)
+      setsecret(req, res, secret, cookie)
     }
 
     // verify the incoming token
