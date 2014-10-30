@@ -2,6 +2,7 @@
  * csurf
  * Copyright(c) 2011 Sencha Inc.
  * Copyright(c) 2014 Jonathan Ong
+ * Copyright(c) 2014 Maël Nison
  * Copyright(c) 2014-2016 Douglas Christopher Wilson
  * MIT Licensed
  */
@@ -39,6 +40,26 @@ module.exports = csurf
  */
 
 function csurf (options) {
+  var generator = csurf.generator(options)
+  var validator = csurf.validator(options)
+
+  return function csurf (req, res, next) {
+    generator(req, res, function (err) {
+      if (err) return next(err)
+      try {
+        validator(req, res, next)
+      } catch (error) {
+        next(error)
+      }
+    })
+  }
+}
+
+csurf.generator = function csurfGeneratorBuilder (options) {
+  var curToken = null
+  var curSecret
+
+  // default options
   var opts = options || {}
 
   // get cookie options
@@ -47,16 +68,56 @@ function csurf (options) {
   // get session options
   var sessionKey = opts.sessionKey || 'session'
 
-  // get value getter
-  var value = opts.value || defaultValue
+  // token manager
+  var tokenManager = new Tokens(opts)
 
-  // token repo
-  var tokens = new Tokens(opts)
+  // csrf parameter getter
+  var getRequestCsrf = opts.value || defaultValue
+
+  return function csurfGenerator (req, res, next) {
+    // validate the configuration against request
+    if (!verifyConfiguration(req, sessionKey, cookie)) {
+      return next(new Error('misconfigured csrf'))
+    }
+
+    req.csrfToken = function () {
+      var secret = getSecret(req, sessionKey, cookie)
+
+      if (curToken !== null && curSecret === secret) {
+        // use cached token if secret has not changed
+        return curToken
+      } else {
+        if (secret === undefined) {
+          // no csrf in the session, so we create a new one
+          secret = tokenManager.secretSync()
+          setSecret(req, res, sessionKey, secret, cookie)
+        }
+
+        // update cached token
+        curToken = tokenManager.create(secret)
+        curSecret = secret
+
+        return curToken
+      }
+    }
+
+    req.checkCsrf = function () {
+      var secret = getSecret(req, sessionKey, cookie)
+
+      return tokenManager.verify(secret, getRequestCsrf(req))
+    }
+
+    next()
+  }
+}
+
+csurf.validator = function csurfValidatorBuilder (options) {
+  // default options
+  options = options || {}
 
   // ignored methods
-  var ignoreMethods = opts.ignoreMethods === undefined
-    ? ['GET', 'HEAD', 'OPTIONS']
-    : opts.ignoreMethods
+  var ignoreMethods = options.ignoreMethods === undefined
+    ? ['GET', 'HEAD', 'OPTIONS'] : options.ignoreMethods
 
   if (!Array.isArray(ignoreMethods)) {
     throw new TypeError('option ignoreMethods must be an array')
@@ -65,53 +126,12 @@ function csurf (options) {
   // generate lookup
   var ignoreMethod = getIgnoredMethods(ignoreMethods)
 
-  return function csrf (req, res, next) {
-    // validate the configuration against request
-    if (!verifyConfiguration(req, sessionKey, cookie)) {
-      return next(new Error('misconfigured csrf'))
-    }
-
-    // get the secret from the request
-    var secret = getSecret(req, sessionKey, cookie)
-    var token
-
-    // lazy-load token getter
-    req.csrfToken = function csrfToken () {
-      var sec = !cookie
-        ? getSecret(req, sessionKey, cookie)
-        : secret
-
-      // use cached token if secret has not changed
-      if (token && sec === secret) {
-        return token
-      }
-
-      // generate & set new secret
-      if (sec === undefined) {
-        sec = tokens.secretSync()
-        setSecret(req, res, sessionKey, sec, cookie)
-      }
-
-      // update changed secret
-      secret = sec
-
-      // create new token
-      token = tokens.create(secret)
-
-      return token
-    }
-
-    // generate & set secret
-    if (!secret) {
-      secret = tokens.secretSync()
-      setSecret(req, res, sessionKey, secret, cookie)
-    }
-
+  return function csurfValidator (req, res, next) {
     // verify the incoming token
-    if (!ignoreMethod[req.method] && !tokens.verify(secret, value(req))) {
-      return next(createError(403, 'invalid csrf token', {
+    if (!ignoreMethod[req.method] && !req.checkCsrf()) {
+      throw createError(403, 'invalid csrf token', {
         code: 'EBADCSRFTOKEN'
-      }))
+      })
     }
 
     next()
