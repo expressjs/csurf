@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+ * bump csrf
  * bump http-errors
 
 1.6.2 / 2014-10-14
