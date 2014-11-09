@@ -1,13 +1,13 @@
 
 process.env.NODE_ENV = 'test';
 
+var assert = require('assert');
 var connect = require('connect');
 var http = require('http')
 var session = require('cookie-session');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var request = require('supertest');
-var should = require('should')
 var url = require('url')
 
 var csurf = require('..')
@@ -89,7 +89,8 @@ describe('csurf', function () {
       if (err) return done(err)
       var token = res.text;
 
-      res.headers['set-cookie'][0].split('=')[0].should.equal('_csrf');
+      assert.equal(res.headers['set-cookie'].length, 1);
+      assert.equal(res.headers['set-cookie'][0].split('=')[0], '_csrf');
 
       request(server)
       .post('/')
@@ -108,7 +109,8 @@ describe('csurf', function () {
       if (err) return done(err)
       var token = res.text;
 
-      res.headers['set-cookie'][0].split('=')[0].should.equal('_customcsrf');
+      assert.equal(res.headers['set-cookie'].length, 1);
+      assert.equal(res.headers['set-cookie'][0].split('=')[0], '_customcsrf');
 
       request(server)
       .post('/')
@@ -214,7 +216,7 @@ describe('csurf', function () {
 
   describe('with "ignoreMethods" option', function () {
     it('should reject invalid value', function () {
-      createServer.bind(null, {ignoreMethods: 'tj'}).should.throw(/option ignoreMethods/)
+      assert.throws(createServer.bind(null, {ignoreMethods: 'tj'}), /option ignoreMethods/)
     })
 
     it('should not check token on given methods', function (done) {

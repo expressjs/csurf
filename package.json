@@ -21,7 +21,6 @@
     "cookie-session": "~1.0.2",
     "istanbul": "0.3.2",
     "mocha": "~2.0.1",
-    "should": "~4.0.4",
     "supertest": "~0.14.0"
   },
   "engines": {
