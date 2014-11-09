@@ -1,5 +1,5 @@
-unreleased
-==========
+1.6.3 / 2014-11-09
+==================
 
  * bump csrf
  * bump http-errors
