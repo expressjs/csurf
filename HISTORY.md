@@ -1,6 +1,10 @@
 unreleased
 ==========
 
+  * deps: csrf@~2.0.3
+    - Slight speed improvement for `verify`
+    - deps: base64-url@1.1.0
+    - deps: rndm@~1.1.0
   * deps: http-errors@~1.2.8
    - Fix stack trace from exported function
 
