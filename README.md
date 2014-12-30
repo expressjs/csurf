@@ -7,9 +7,9 @@
 
 Node.js [CSRF](https://en.wikipedia.org/wiki/Cross-site_request_forgery) protection middleware.
 
-Requires either a session middleware or [cookie-parser](https://github.com/expressjs/cookie-parser) to be initialized first.
-- [session](https://github.com/expressjs/session)
-- [cookie-session](https://github.com/expressjs/cookie-session)
+Requires either a session middleware or [cookie-parser](https://www.npmjs.com/package/cookie-parser) to be initialized first.
+- [express-session](https://www.npmjs.com/package/express-session)
+- [cookie-session](https://www.npmjs.com/package/cookie-session)
 
 ### Install
 
