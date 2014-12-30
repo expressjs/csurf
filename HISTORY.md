@@ -1,3 +1,9 @@
+unreleased
+==========
+
+  * deps: http-errors@~1.2.8
+   - Fix stack trace from exported function
+
 1.6.3 / 2014-11-09
 ==================
 
