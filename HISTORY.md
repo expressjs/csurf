@@ -1,5 +1,5 @@
-unreleased
-==========
+1.6.4 / 2014-12-30
+==================
 
   * deps: csrf@~2.0.3
     - Slight speed improvement for `verify`
