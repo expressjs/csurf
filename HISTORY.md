@@ -1,62 +1,67 @@
 1.6.3 / 2014-11-09
 ==================
 
- * bump csrf
- * bump http-errors
+  * deps: csrf@~2.0.2
+    - deps: scmp@1.0.0
+  * deps: http-errors@~1.2.7
+   - Remove duplicate line
 
 1.6.2 / 2014-10-14
 ==================
 
- * bump http-errors
- * fix cookie name when using `cookie: true`
+  * Fix cookie name when using `cookie: true`
+  * deps: http-errors@~1.2.6
+    - Fix `expose` to be `true` for `ClientError` constructor
+    - Use `inherits` instead of `util`
+    - deps: statuses@1
 
 1.6.1 / 2014-09-05
 ==================
 
- * bump cookie-signature
+  * deps: cookie-signature@1.0.5
 
 1.6.0 / 2014-09-03
 ==================
 
- * set `code` property on CSRF token errors
+  * Set `code` property on CSRF token errors
 
 1.5.0 / 2014-08-24
 ==================
 
- * add `ignoreMethods` option
+  * Add `ignoreMethods` option
 
 1.4.1 / 2014-08-22
 ==================
 
- * csrf-tokens -> csrf
+  * Use `csrf-tokens` instead of `csrf`
  
 1.4.0 / 2014-07-30
 ==================
 
- * Support changing `req.session` after `csurf` middleware
-   - Calling `res.csrfToken()` after `req.session.destroy()` will now work
+  * Support changing `req.session` after `csurf` middleware
+    - Calling `res.csrfToken()` after `req.session.destroy()` will now work
 
 1.3.0 / 2014-07-03
 ==================
 
- * add support for environments without `res.cookie` (connect@3)
+  * Add support for environments without `res.cookie` (connect@3)
 
 1.2.2 / 2014-06-18
 ==================
 
- * bump csrf-tokens
+  * deps: csrf-tokens@~2.0.0
 
 1.2.1 / 2014-06-09
 ==================
 
- * refactor to use csrf-tokens
+  * Refactor to use `csrf-tokens` module
 
 1.2.0 / 2014-05-13
 ==================
 
- * add support for double-submit cookie
+  * Add support for double-submit cookie
 
 1.1.0 / 2014-04-06
 ==================
 
- * add constant-time string compare
+  * Add constant-time string compare
