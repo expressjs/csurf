@@ -61,7 +61,7 @@ module.exports = function csurf(options) {
 
   return function csrf(req, res, next) {
     var secret = getsecret(req, cookie)
-    var token
+    var token = value(req)
 
     // lazy-load token getter
     req.csrfToken = function csrfToken() {
@@ -97,7 +97,7 @@ module.exports = function csurf(options) {
 
     // verify the incoming token
     if (!ignoreMethod[req.method]) {
-      verifytoken(req, tokens, secret, value(req))
+      verifytoken(req, tokens, secret, token)
     }
 
     next()
