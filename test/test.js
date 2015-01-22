@@ -313,6 +313,36 @@ describe('csurf', function () {
       .expect(500, /misconfigured csrf/, done)
     })
   })
+
+  describe('manual validation', function() {
+    var app
+    before(function(){
+      app = connect()
+      app.use(session({ keys: ['a', 'b'] }))
+      app.use(csurf())
+      app.use('/verify', function (req, res) {
+        req.csrfVerify()
+        res.end()
+      })
+      app.use('/check', function (req, res) {
+        res.end('result:'+req.csrfCheck())
+      })
+    })
+    describe('req.csrfVerify()', function() {
+      it('requires a valid token to be passed', function(done) {
+        request(app)
+        .get('/verify')
+        .expect(403, done)
+      })
+    })
+    describe('req.csrfCheck()', function() {
+      it('checks whether a valid token was passed', function(done) {
+        request(app)
+        .get('/check')
+        .expect('result:false', done)
+      })
+    })
+  })
 });
 
 function cookies(req) {

@@ -95,9 +95,16 @@ module.exports = function csurf(options) {
       setsecret(req, res, secret, cookie)
     }
 
-    // verify the incoming token
     if (!ignoreMethod[req.method]) {
+      // verify the incoming token
       verifytoken(req, tokens, secret, value(req))
+    } else {
+      // allow to manually verify later
+      req.csrfVerify = verifytoken.bind(null, req, tokens, secret, value(req))
+      req.csrfCheck = function(){
+        try { return req.csrfVerify(), true }
+        catch (err) { return false }
+      }
     }
 
     next()
@@ -238,4 +245,7 @@ function verifytoken(req, tokens, secret, val) {
       code: 'EBADCSRFTOKEN'
     });
   }
+  // mark req as valid and don't check again
+  req.csrfVerify = function(){ }
+  req.csrfCheck = function(){ return true }
 }
