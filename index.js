@@ -117,7 +117,9 @@ function defaultValue(req) {
   return (req.body && req.body._csrf)
     || (req.query && req.query._csrf)
     || (req.headers['x-csrf-token'])
-    || (req.headers['x-xsrf-token']);
+    || (req.headers['x-xsrf-token'])
+    || (req.headers['csrf-token'])
+    || (req.headers['xsrf-token']);
 }
 
 /**
