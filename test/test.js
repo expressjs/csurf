@@ -80,6 +80,41 @@ describe('csurf', function () {
     });
   });
 
+  it('should work in csrf-token header', function(done) {
+    var server = createServer()
+
+    request(server)
+    .get('/')
+    .expect(200, function (err, res) {
+      if (err) return done(err)
+      var token = res.text;
+
+      request(server)
+      .post('/')
+      .set('Cookie', cookies(res))
+      .set('csrf-token', token)
+      .expect(200, done)
+    });
+  });
+
+  it('should work in xsrf-token header', function(done) {
+    var server = createServer()
+
+    request(server)
+    .get('/')
+    .expect(200, function (err, res) {
+      if (err) return done(err)
+      var token = res.text;
+
+      request(server)
+      .post('/')
+      .set('Cookie', cookies(res))
+      .set('xsrf-token', token)
+      .expect(200, done)
+    });
+  });
+
+
   it('should work with a valid token (cookie-based, defaults)', function(done) {
     var server = createServer({ cookie: true })
 
