@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+  * Accept `CSRF-Token` and `XSRF-Token` request headers
   * Default `cookie.path` to `'/'`, if using cookies
   * deps: cookie-signature@1.0.6
   * deps: csrf@~2.0.6
