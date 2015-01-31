@@ -11,6 +11,9 @@ Requires either a session middleware or [cookie-parser](https://www.npmjs.com/pa
 - [express-session](https://www.npmjs.com/package/express-session)
 - [cookie-session](https://www.npmjs.com/package/cookie-session)
 
+If you have questions on how this module is implemented, please read
+[Understanding CSRF](https://github.com/pillarjs/understanding-csrf).
+
 ### Install
 
 ```sh
