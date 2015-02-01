@@ -199,7 +199,7 @@ describe('csurf', function () {
     app.use(csurf())
 
     request(app)
-    .get('/')
+    .post('/')
     .expect(500, /misconfigured csrf/, done)
   });
 
@@ -210,7 +210,7 @@ describe('csurf', function () {
     app.use(csurf({ cookie: { signed: true } }))
 
     request(app)
-    .get('/')
+    .post('/')
     .expect(500, /cookieParser.*secret/, done)
   });
 
