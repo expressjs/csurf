@@ -2,7 +2,7 @@
  * csurf
  * Copyright(c) 2011 Sencha Inc.
  * Copyright(c) 2014 Jonathan Ong
- * Copyright(c) 2014 Douglas Christopher Wilson
+ * Copyright(c) 2014-2015 Douglas Christopher Wilson
  * MIT Licensed
  */
 
@@ -32,20 +32,13 @@ module.exports = function csurf(options) {
   options = options || {};
 
   // get cookie options
-  var cookie = options.cookie !== true
-    ? options.cookie || undefined
-    : {}
+  var cookie = getCookieOptions(options.cookie)
 
   // get value getter
   var value = options.value || defaultValue
 
   // token repo
   var tokens = csrfTokens(options);
-
-  // default cookie key
-  if (cookie && !cookie.key) {
-    cookie.key = '_csrf'
-  }
 
   // ignored methods
   var ignoreMethods = options.ignoreMethods === undefined
@@ -118,6 +111,37 @@ function defaultValue(req) {
     || (req.query && req.query._csrf)
     || (req.headers['x-csrf-token'])
     || (req.headers['x-xsrf-token']);
+}
+
+/**
+ * Get options for cookie.
+ *
+ * @param {boolean|object} [options]
+ * @returns {object}
+ * @api private
+ */
+
+function getCookieOptions(options) {
+  if (options !== true && typeof options !== 'object') {
+    return undefined
+  }
+
+  var opts = {
+    key: '_csrf',
+    path: '/'
+  }
+
+  if (options && typeof options === 'object') {
+    for (var prop in options) {
+      var val = options[prop]
+
+      if (val !== undefined) {
+        opts[prop] = val
+      }
+    }
+  }
+
+  return opts
 }
 
 /**

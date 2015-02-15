@@ -87,10 +87,11 @@ describe('csurf', function () {
     .get('/')
     .expect(200, function (err, res) {
       if (err) return done(err)
-      var token = res.text;
+      var data = cookie(res, '_csrf')
+      var token = res.text
 
-      assert.equal(res.headers['set-cookie'].length, 1);
-      assert.equal(res.headers['set-cookie'][0].split('=')[0], '_csrf');
+      assert.ok(Boolean(data))
+      assert.ok(/; *path=\/(?:;|$)/i.test(data))
 
       request(server)
       .post('/')
@@ -107,10 +108,11 @@ describe('csurf', function () {
     .get('/')
     .expect(200, function (err, res) {
       if (err) return done(err)
-      var token = res.text;
+      var data = cookie(res, '_customcsrf')
+      var token = res.text
 
-      assert.equal(res.headers['set-cookie'].length, 1);
-      assert.equal(res.headers['set-cookie'][0].split('=')[0], '_customcsrf');
+      assert.ok(Boolean(data))
+      assert.ok(/; *path=\/(?:;|$)/i.test(data))
 
       request(server)
       .post('/')
@@ -315,10 +317,16 @@ describe('csurf', function () {
   })
 });
 
-function cookies(req) {
-  return req.headers['set-cookie'].map(function (cookies) {
-    return cookies.split(';')[0];
-  }).join(';');
+function cookie(res, name) {
+  return res.headers['set-cookie'].filter(function (cookies) {
+    return cookies.split('=')[0] === name
+  })[0]
+}
+
+function cookies(res) {
+  return res.headers['set-cookie'].map(function (cookies) {
+    return cookies.split(';')[0]
+  }).join(';')
 }
 
 function createServer(opts) {

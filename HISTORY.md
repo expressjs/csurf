@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+  * Default `cookie.path` to `'/'`, if using cookies
   * deps: cookie-signature@1.0.6
   * deps: csrf@~2.0.6
     - deps: base64-url@1.2.1

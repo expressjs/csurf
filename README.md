@@ -52,7 +52,8 @@ defaults for the options are used). The options may contain any of the
 following keys:
 
   - `key` - the name of the cookie to use to store the token secret
-    (defaults to `_csrf`).
+    (defaults to `'_csrf'`).
+  - `path` - the path of the cookie (defaults to `'/'`).
   - any other [res.cookie](http://expressjs.com/4x/api.html#res.cookie)
     option can be set.
 
@@ -90,7 +91,7 @@ var bodyParser = require('body-parser')
 var express = require('express')
 
 // setup route middlewares
-var csrfProtection = csrf({ cookie: { path: '/' } })
+var csrfProtection = csrf({ cookie: true })
 var parseForm = bodyparser.urlencoded({ extended: false })
 
 // create express app
@@ -137,7 +138,7 @@ var express = require('express')
 var app = express()
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
-app.use(csrf({ cookie: { path: '/' } }))
+app.use(csrf({ cookie: true }))
 
 // error handler
 app.use(function (err, req, res, next) {
