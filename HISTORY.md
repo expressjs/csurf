@@ -5,6 +5,10 @@ unreleased
   * deps: csrf@~2.0.6
     - deps: base64-url@1.2.1
     - deps: uid-safe@~1.1.0
+  * deps: http-errors@~1.3.1
+   - Construct errors using defined constructors from `createError`
+   - Fix error names that are not identifiers
+   - Set a meaningful `name` property on constructed errors
 
 1.6.6 / 2015-01-31
 ==================
