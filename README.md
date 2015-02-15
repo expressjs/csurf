@@ -4,6 +4,7 @@
 [![NPM Downloads][downloads-image]][downloads-url]
 [![Build status][travis-image]][travis-url]
 [![Test coverage][coveralls-image]][coveralls-url]
+[![Gratipay][gratipay-image]][gratipay-url]
 
 Node.js [CSRF](https://en.wikipedia.org/wiki/Cross-site_request_forgery) protection middleware.
 
@@ -160,3 +161,5 @@ app.use(function (err, req, res, next) {
 [coveralls-url]: https://coveralls.io/r/expressjs/csurf?branch=master
 [downloads-image]: https://img.shields.io/npm/dm/csurf.svg
 [downloads-url]: https://npmjs.org/package/csurf
+[gratipay-image]: https://img.shields.io/gratipay/dougwilson.svg
+[gratipay-url]: https://gratipay.com/dougwilson/
