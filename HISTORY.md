@@ -1,5 +1,5 @@
-unreleased
-==========
+1.7.0 / 2015-02-15
+==================
 
   * Accept `CSRF-Token` and `XSRF-Token` request headers
   * Default `cookie.path` to `'/'`, if using cookies
