@@ -89,8 +89,10 @@ describe('csurf', function () {
       if (err) return done(err)
       var token = res.text;
 
-      assert.equal(res.headers['set-cookie'].length, 1);
-      assert.equal(res.headers['set-cookie'][0].split('=')[0], '_csrf');
+      var cookieHeaders = res.headers['set-cookie'];
+      assert.equal(cookieHeaders.length, 1);
+      assert.ok(cookieHeaders[0].match(/_csrf=/), 'Cookie default name does not match');
+      assert.ok(cookieHeaders[0].match(/Path=\//), 'Cookie default path does not match');
 
       request(server)
       .post('/')
@@ -100,8 +102,8 @@ describe('csurf', function () {
     });
   });
 
-  it('should work with a valid token (cookie-based, custom key)', function(done) {
-    var server = createServer({ cookie: { key: '_customcsrf' } });
+  it('should work with a valid token (cookie-based, custom key, custom path)', function(done) {
+    var server = createServer({ cookie: { key: '_customcsrf', path: 'an/other/path' } });
 
     request(server)
     .get('/')
@@ -109,8 +111,10 @@ describe('csurf', function () {
       if (err) return done(err)
       var token = res.text;
 
-      assert.equal(res.headers['set-cookie'].length, 1);
-      assert.equal(res.headers['set-cookie'][0].split('=')[0], '_customcsrf');
+      var cookieHeaders = res.headers['set-cookie'];
+      assert.equal(cookieHeaders.length, 1);
+      assert.ok(cookieHeaders[0].match(/_customcsrf=/), 'Cookie custom name does not match');
+      assert.ok(cookieHeaders[0].match(/Path=an\/other\/path/), 'Cookie custom path does not match');
 
       request(server)
       .post('/')

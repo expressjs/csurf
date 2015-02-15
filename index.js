@@ -47,6 +47,11 @@ module.exports = function csurf(options) {
     cookie.key = '_csrf'
   }
 
+  // default cookie path
+  if (cookie && !cookie.path) {
+    cookie.path = '/'
+  }
+
   // ignored methods
   var ignoreMethods = options.ignoreMethods === undefined
     ? ['GET', 'HEAD', 'OPTIONS']
