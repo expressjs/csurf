@@ -152,11 +152,11 @@ app.use(function (err, req, res, next) {
 
 [MIT](LICENSE)
 
-[npm-image]: https://img.shields.io/npm/v/csurf.svg?style=flat
+[npm-image]: https://img.shields.io/npm/v/csurf.svg
 [npm-url]: https://npmjs.org/package/csurf
-[travis-image]: https://img.shields.io/travis/expressjs/csurf.svg?style=flat
+[travis-image]: https://img.shields.io/travis/expressjs/csurf/master.svg
 [travis-url]: https://travis-ci.org/expressjs/csurf
-[coveralls-image]: https://img.shields.io/coveralls/expressjs/csurf.svg?style=flat
+[coveralls-image]: https://img.shields.io/coveralls/expressjs/csurf/master.svg
 [coveralls-url]: https://coveralls.io/r/expressjs/csurf?branch=master
-[downloads-image]: https://img.shields.io/npm/dm/csurf.svg?style=flat
+[downloads-image]: https://img.shields.io/npm/dm/csurf.svg
 [downloads-url]: https://npmjs.org/package/csurf
