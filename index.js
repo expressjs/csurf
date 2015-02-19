@@ -31,6 +31,9 @@ var sign = require('cookie-signature').sign;
 module.exports = function csurf(options) {
   options = options || {};
 
+  //get client user agent array
+  var clientUserAgent = options.clientUserAgent || [];
+
   // get cookie options
   var cookie = getCookieOptions(options.cookie)
 
@@ -53,6 +56,21 @@ module.exports = function csurf(options) {
   var ignoreMethod = getIgnoredMethods(ignoreMethods)
 
   return function csrf(req, res, next) {
+
+    if(clientUserAgent.length>0)
+    {
+      var userAgent = req.headers["user-agent"];
+      for(var i= 0,len=clientUserAgent.length;i<len;i++)
+      {
+        if(userAgent === clientUserAgent[i])
+        {
+          req.nocsurf = true;
+          next();
+          return true;
+        }
+      }
+    }
+
     var secret = getsecret(req, cookie)
     var token
 
