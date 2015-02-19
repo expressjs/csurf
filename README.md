@@ -78,6 +78,12 @@ locations, in order:
   - `req.headers['xsrf-token']` - the `XSRF-Token` HTTP request header.
   - `req.headers['x-csrf-token']` - the `X-CSRF-Token` HTTP request header.
   - `req.headers['x-xsrf-token']` - the `X-XSRF-Token` HTTP request header.
+  
+##### clientUserAgent
+
+An Array of the methods for which user-agent request that CSRF token checking will disabled.
+Like `["iOS","Android","WindowsPhone"]`.
+
 
 ## Example
 
