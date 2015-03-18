@@ -9,8 +9,13 @@
 Node.js [CSRF](https://en.wikipedia.org/wiki/Cross-site_request_forgery) protection middleware.
 
 Requires either a session middleware or [cookie-parser](https://www.npmjs.com/package/cookie-parser) to be initialized first.
-- [express-session](https://www.npmjs.com/package/express-session)
-- [cookie-session](https://www.npmjs.com/package/cookie-session)
+
+  * If you are setting the ["cookie" option](#cookie) to a non-`false` value,
+    then you must use [cookie-parser](https://www.npmjs.com/package/cookie-parser)
+    before this module.
+  * Otherwise, you must use a session middleware before this module. For example:
+    - [express-session](https://www.npmjs.com/package/express-session)
+    - [cookie-session](https://www.npmjs.com/package/cookie-session)
 
 If you have questions on how this module is implemented, please read
 [Understanding CSRF](https://github.com/pillarjs/understanding-csrf).
@@ -42,9 +47,13 @@ any of the following keys:
 ##### cookie
 
 Determines if the token secret for the user should be stored in a cookie
-(when set to `true` or an object, requires a cookie parsing module) or in
-`req.session` (when set to `false`, provided by another module). Defaults
-to `false`.
+or in `req.session`. Defaults to `false`.
+
+When set to `true` (or an object of options for the cookie), then the module
+changes behavior and no longer uses `req.session`. This means you _are no
+longer required to use a session middleware_. Instead, you do need to use the
+[cookie-parser](https://www.npmjs.com/package/cookie-parser) middleware in
+your app before this middleware.
 
 When set to an object, cookie storage of the secret is enabled and the
 object contains options for this functionality (when set to `true`, the
@@ -100,6 +109,7 @@ var parseForm = bodyParser.urlencoded({ extended: false })
 var app = express()
 
 // parse cookies
+// we need this because "cookie" is true in csrfProtection
 app.use(cookieParser())
 
 app.get('/form', csrfProtection, function(req, res) {
