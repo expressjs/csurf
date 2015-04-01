@@ -56,13 +56,13 @@ module.exports = function csurf(options) {
   var ignoreMethod = getIgnoredMethods(ignoreMethods)
 
   return function csrf(req, res, next) {
-    var secret = getsecret(req, cookie)
+    var secret = getsecret(req, sessionKey, cookie)
     var token
 
     // lazy-load token getter
     req.csrfToken = function csrfToken() {
       var sec = !cookie
-        ? getsecret(req, cookie)
+        ? getsecret(req, sessionKey, cookie)
         : secret
 
       // use cached token if secret has not changed
@@ -172,11 +172,12 @@ function getIgnoredMethods(methods) {
  * Get the token secret from the request.
  *
  * @param {IncomingMessage} req
+ * @param {String} sessionKey
  * @param {Object} [cookie]
  * @api private
  */
 
-function getsecret(req, cookie) {
+function getsecret(req, sessionKey, cookie) {
   var secret
 
   if (cookie) {
@@ -186,9 +187,9 @@ function getsecret(req, cookie) {
       : 'cookies'
 
     secret = req[bag][cookie.key]
-  } else if (req.session) {
+  } else if (req[sessionKey]) {
     // get secret from session
-    secret = req.session.csrfSecret
+    secret = req[sessionKey].csrfSecret
   } else {
     throw new Error('misconfigured csrf')
   }
