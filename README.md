@@ -57,6 +57,17 @@ following keys:
   - any other [res.cookie](http://expressjs.com/4x/api.html#res.cookie)
     option can be set.
 
+##### sessionKey
+
+If `cookie` is set to `false`, which means a session will be used for storing
+the token secret -- this setting determines *which* session key should be used.
+
+This allows for you to store CSRF tokens in a particular session store.
+
+This defaults to `'session'` (*eg: req.session*).  If you change it to another
+string, like `'testSession'`, for instance, then the `req.testSession` session
+will be used to store CSRF tokens.
+
 ##### ignoreMethods
 
 An array of the methods for which CSRF token checking will disabled.
