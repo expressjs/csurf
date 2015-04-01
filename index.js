@@ -34,6 +34,9 @@ module.exports = function csurf(options) {
   // get cookie options
   var cookie = getCookieOptions(options.cookie)
 
+  // get session options
+  var sessionKey = options.sessionKey || 'session'
+
   // get value getter
   var value = options.value || defaultValue
 
