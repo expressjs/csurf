@@ -277,6 +277,35 @@ describe('csurf', function () {
     })
   })
 
+  describe('with "sessionKey" option', function () {
+    it('should use the specified sessionKey', function (done) {
+      var app = connect()
+      var sess = {}
+
+      app.use(function (req, res, next) {
+        req.mySession = sess
+        next()
+      })
+      app.use(bodyParser.urlencoded({ extended: false }))
+      app.use(csurf({ sessionKey: 'mySession' }))
+      app.use(function (req, res, next) {
+        res.end(req.csrfToken() || 'none')
+      })
+
+      request(app)
+      .get('/')
+      .expect(200, function (err, res) {
+        if (err) return done(err)
+        var token = res.text;
+
+        request(app)
+        .post('/')
+        .send('_csrf=' + encodeURIComponent(token))
+        .expect(200, done)
+      })
+    })
+  })
+
   describe('req.csrfToken()', function () {
     it('should return same token for each call', function (done) {
       var app = connect()

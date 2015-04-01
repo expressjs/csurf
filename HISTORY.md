@@ -1,3 +1,8 @@
+unreleased
+==========
+
+  * Add `sessionKey` option
+
 1.7.0 / 2015-02-15
 ==================
 
