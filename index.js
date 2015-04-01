@@ -73,7 +73,7 @@ module.exports = function csurf(options) {
       // generate & set new secret
       if (sec === undefined) {
         sec = tokens.secretSync()
-        setsecret(req, res, sec, cookie)
+        setsecret(req, res, sessionKey, sec, cookie)
       }
 
       // update changed secret
@@ -88,7 +88,7 @@ module.exports = function csurf(options) {
     // generate & set secret
     if (!secret) {
       secret = tokens.secretSync()
-      setsecret(req, res, secret, cookie)
+      setsecret(req, res, sessionKey, secret, cookie)
     }
 
     // verify the incoming token
@@ -223,12 +223,13 @@ function setcookie(res, name, val, options) {
  *
  * @param {IncomingMessage} req
  * @param {OutgoingMessage} res
+ * @param {string} sessionKey
  * @param {string} val
  * @param {Object} [cookie]
  * @api private
  */
 
-function setsecret(req, res, val, cookie) {
+function setsecret(req, res, sessionKey, val, cookie) {
   if (cookie) {
     // set secret on cookie
     if (cookie.signed) {
@@ -242,9 +243,9 @@ function setsecret(req, res, val, cookie) {
     }
 
     setcookie(res, cookie.key, val, cookie);
-  } else if (req.session) {
+  } else if (req[sessionKey]) {
     // set secret on session
-    req.session.csrfSecret = val
+    req[sessionKey].csrfSecret = val
   } else {
     /* istanbul ignore next: should never actually run */
     throw new Error('misconfigured csrf')
