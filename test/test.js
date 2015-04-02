@@ -5,6 +5,7 @@ var assert = require('assert');
 var connect = require('connect');
 var http = require('http')
 var session = require('cookie-session');
+var nsession = require('client-sessions');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var request = require('supertest');
@@ -291,6 +292,62 @@ describe('csurf', function () {
       request(app)
       .get('/')
       .expect(200, 'true', done)
+    })
+  })
+
+  describe('when using a custom sessionKey', function() {
+    var sessionMiddleware = nsession({
+      cookieName: 'test',
+      requestKey: 'testSession',
+      secret: 'test',
+      duration: 60 * 1000
+    })
+
+    it('should break when no session exists', function(done) {
+      var app = connect()
+
+      app.use(sessionMiddleware)
+      app.use(csurf())
+      app.use('/break', function(req, res, next) {
+        next()
+      })
+
+      request(app)
+      .get('/break')
+      .expect(500, /misconfigured csrf/, done)
+    })
+
+    it('should use the specified sessionKey', function(done) {
+      var app = connect()
+
+      app.use(sessionMiddleware)
+      app.use(csurf({ sessionKey: 'testSession' }))
+      app.use('/work', function(req, res, next) {
+        res.end(req.csrfToken() || 'none')
+      })
+
+      request(app)
+      .get('/work')
+      .expect(200, done)
+    })
+
+    it('should default sessionKey to session', function(done) {
+      var app = connect()
+
+      app.use(nsession({
+        cookieName: 'test',
+        requestKey: 'session',
+        secret: 'test',
+        duration: 60 * 1000
+      }))
+      app.use(csurf())
+      app.use('/work', function(req, res, next) {
+        res.end(req.csrfToken() || 'none')
+      })
+
+      request(app)
+      .get('/work')
+      .expect(200, done)
     })
   })
 
