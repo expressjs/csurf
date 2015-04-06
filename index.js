@@ -34,6 +34,9 @@ module.exports = function csurf(options) {
   // get cookie options
   var cookie = getCookieOptions(options.cookie)
 
+  // get session options
+  var sessionKey = options.sessionKey || 'session'
+
   // get value getter
   var value = options.value || defaultValue
 
@@ -53,13 +56,13 @@ module.exports = function csurf(options) {
   var ignoreMethod = getIgnoredMethods(ignoreMethods)
 
   return function csrf(req, res, next) {
-    var secret = getsecret(req, cookie)
+    var secret = getsecret(req, sessionKey, cookie)
     var token
 
     // lazy-load token getter
     req.csrfToken = function csrfToken() {
       var sec = !cookie
-        ? getsecret(req, cookie)
+        ? getsecret(req, sessionKey, cookie)
         : secret
 
       // use cached token if secret has not changed
@@ -70,7 +73,7 @@ module.exports = function csurf(options) {
       // generate & set new secret
       if (sec === undefined) {
         sec = tokens.secretSync()
-        setsecret(req, res, sec, cookie)
+        setsecret(req, res, sessionKey, sec, cookie)
       }
 
       // update changed secret
@@ -85,7 +88,7 @@ module.exports = function csurf(options) {
     // generate & set secret
     if (!secret) {
       secret = tokens.secretSync()
-      setsecret(req, res, secret, cookie)
+      setsecret(req, res, sessionKey, secret, cookie)
     }
 
     // verify the incoming token
@@ -169,11 +172,12 @@ function getIgnoredMethods(methods) {
  * Get the token secret from the request.
  *
  * @param {IncomingMessage} req
+ * @param {String} sessionKey
  * @param {Object} [cookie]
  * @api private
  */
 
-function getsecret(req, cookie) {
+function getsecret(req, sessionKey, cookie) {
   var secret
 
   if (cookie) {
@@ -183,9 +187,9 @@ function getsecret(req, cookie) {
       : 'cookies'
 
     secret = req[bag][cookie.key]
-  } else if (req.session) {
+  } else if (req[sessionKey]) {
     // get secret from session
-    secret = req.session.csrfSecret
+    secret = req[sessionKey].csrfSecret
   } else {
     throw new Error('misconfigured csrf')
   }
@@ -219,12 +223,13 @@ function setcookie(res, name, val, options) {
  *
  * @param {IncomingMessage} req
  * @param {OutgoingMessage} res
+ * @param {string} sessionKey
  * @param {string} val
  * @param {Object} [cookie]
  * @api private
  */
 
-function setsecret(req, res, val, cookie) {
+function setsecret(req, res, sessionKey, val, cookie) {
   if (cookie) {
     // set secret on cookie
     if (cookie.signed) {
@@ -238,9 +243,9 @@ function setsecret(req, res, val, cookie) {
     }
 
     setcookie(res, cookie.key, val, cookie);
-  } else if (req.session) {
+  } else if (req[sessionKey]) {
     // set secret on session
-    req.session.csrfSecret = val
+    req[sessionKey].csrfSecret = val
   } else {
     /* istanbul ignore next: should never actually run */
     throw new Error('misconfigured csrf')
