@@ -42,9 +42,13 @@ any of the following keys:
 ##### cookie
 
 Determines if the token secret for the user should be stored in a cookie
-(when set to `true` or an object, requires a cookie parsing module) or in
-`req.session` (when set to `false`, provided by another module). Defaults
-to `false`.
+(when set to `true` or an object, a cookie parsing module e.g.
+[cookie-parser](https://www.npmjs.com/package/cookie-parser) must be required
+before csurf) or in `req.session` (when set to `false` a session module, e.g.
+[express-session](https://www.npmjs.com/package/express-session) or
+[cookie-session](https://www.npmjs.com/package/cookie-session) must be required
+before csurf). Defaults to `false`. Note that you need _either_ a session
+middleware _or_ cookie-parser, not _both_.
 
 When set to an object, cookie storage of the secret is enabled and the
 object contains options for this functionality (when set to `true`, the
@@ -105,7 +109,7 @@ var express = require('express')
 
 // setup route middlewares
 var csrfProtection = csrf({ cookie: true })
-var parseForm = bodyparser.urlencoded({ extended: false })
+var parseForm = bodyParser.urlencoded({ extended: false })
 
 // create express app
 var app = express()
