@@ -1,5 +1,5 @@
-unreleased
-==========
+1.8.0 / 2015-04-07
+==================
 
   * Add `sessionKey` option
 
