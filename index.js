@@ -43,6 +43,12 @@ module.exports = function csurf(options) {
   // token repo
   var tokens = csrfTokens(options);
 
+  var ignorePaths = options.ignorePaths || [];
+  if (!Array.isArray(ignorePaths)) {
+    throw new TypeError('option ignorePaths must be an array')
+  }
+  var ignorePath = getIgnoredPaths(ignorePaths)
+
   // ignored methods
   var ignoreMethods = options.ignoreMethods === undefined
     ? ['GET', 'HEAD', 'OPTIONS']
@@ -92,7 +98,7 @@ module.exports = function csurf(options) {
     }
 
     // verify the incoming token
-    if (!ignoreMethod[req.method]) {
+    if (!ignorePath[req.url] && !ignoreMethod[req.method]) {
       verifytoken(req, tokens, secret, value(req))
     }
 
@@ -147,6 +153,22 @@ function getCookieOptions(options) {
   }
 
   return opts
+}
+
+/**
+ * Get a lookup of ignored paths.
+ *
+ * @param {array} paths
+ * @returns {object}
+ * @api private
+ */
+function getIgnoredPaths(paths) {
+  var obj = Object.create(null)
+
+  for (var i = 0; i < paths.length; i++)
+    obj[ paths[i] ] = true
+
+  return obj
 }
 
 /**
