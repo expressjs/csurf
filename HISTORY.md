@@ -1,3 +1,9 @@
+unreleased
+==========
+
+  * deps: csrf@~2.0.7
+    - Fix compatibility with `crypto.DEFAULT_ENCODING` global changes
+
 1.8.0 / 2015-04-07
 ==================
 
