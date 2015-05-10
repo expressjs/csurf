@@ -8,12 +8,13 @@
 
 /**
  * Module dependencies.
+ * @private
  */
 
 var Cookie = require('cookie');
-var csrfTokens = require('csrf');
 var createError = require('http-errors');
 var sign = require('cookie-signature').sign;
+var Tokens = require('csrf');
 
 /**
  * CSRF protection middleware.
@@ -41,7 +42,7 @@ module.exports = function csurf(options) {
   var value = options.value || defaultValue
 
   // token repo
-  var tokens = csrfTokens(options);
+  var tokens = new Tokens(options);
 
   // ignored methods
   var ignoreMethods = options.ignoreMethods === undefined
