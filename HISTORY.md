@@ -1,3 +1,9 @@
+unreleased
+==========
+
+  * deps: cookie@0.1.3
+    - Slight optimizations
+
 1.8.2 / 2015-05-09
 ==================
 
