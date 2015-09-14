@@ -86,6 +86,10 @@ module.exports = function csurf(options) {
       return token
     }
 
+    req.verifyToken = function verifyToken(token) {
+      return verifytoken(req, tokens, secret, token);
+    };
+
     // generate & set secret
     if (!secret) {
       secret = tokens.secretSync()
