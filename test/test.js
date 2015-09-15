@@ -323,7 +323,7 @@ describe('csurf', function () {
     })
   })
 
-  describe('req.verifyToken()', function () {
+  describe('req.isTokenValid()', function () {
     before(function(done) {
       var _this = this
       var app = connect()
@@ -334,14 +334,9 @@ describe('csurf', function () {
         res.end(req.csrfToken())
       })
       app.use('/check-token', function(req, res) {
-        req.verifyToken(req.headers['oauth-state'])
-        res.end('PASS');
+        var isValid = req.isTokenValid(req.headers['oauth-state'])
+        res.end(isValid ? 'PASS' : 'FAIL')
       });
-      app.use(function (err, req, res, next) {
-        if (err.code !== 'EBADCSRFTOKEN') return next(err)
-        res.statusCode = 403
-        res.end('session has expired or form tampered with')
-      })
       request(app)
       .get('/token')
       .expect(200, function (err, res) {
@@ -364,7 +359,7 @@ describe('csurf', function () {
       .get('/check-token')
       .set('Cookie', this.cookie)
       .set('OAUTH-STATE', String(this.token + 'p'))
-      .expect(403, 'session has expired or form tampered with', done)
+      .expect(200, 'FAIL', done)
     })
     it('should throw on attempting someone else\'s token', function(done) {
       request(this.app)
@@ -375,7 +370,7 @@ describe('csurf', function () {
         .get('/check-token')
         .set('Cookie', this.cookie)
         .set('OAUTH-STATE', String(res.text))
-        .expect(403, 'session has expired or form tampered with', done)
+        .expect(200, 'FAIL', done)
       })
     });
   })
