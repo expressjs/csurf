@@ -323,6 +323,63 @@ describe('csurf', function () {
     })
   })
 
+  describe.only('req.verifyToken()', function () {
+    var app, token, cookie;
+    beforeEach(function(done) {
+      app = connect()
+      app.use(session({ keys: ['a', 'b'] }))
+      app.use(bodyParser.urlencoded({ extended: false }))
+      app.use(csurf())
+      app.use('/token', function(req, res) {
+        res.end(req.csrfToken())
+      })
+      app.use('/check-token', function(req, res) {
+        req.verifyToken(req.headers['oauth-state'])
+        res.end('PASS');
+      });
+      app.use(function (err, req, res, next) {
+        if (err.code !== 'EBADCSRFTOKEN') return next(err)
+        res.statusCode = 403
+        res.end('session has expired or form tampered with')
+      })
+      request(app)
+      .get('/token')
+      .expect(200, function (err, res) {
+        if (err) return done(err)
+        token = res.text
+        cookie = cookies(res)
+        done()
+      })
+
+    })
+    it('should pass on valid tokens', function (done) {
+      request(app)
+      .get('/check-token')
+      .set('OAUTH-STATE', String(token))
+      .set('Cookie', cookie)
+      .expect(200, 'PASS', done)
+    })
+    it('should throw on invalid tokens', function (done) {
+      request(app)
+      .get('/check-token')
+      .set('Cookie', cookie)
+      .set('OAUTH-STATE', String(token + 'p'))
+      .expect(403, 'session has expired or form tampered with', done)
+    })
+    it('should throw on attempting someone else\'s token', function(done) {
+      request(app)
+      .get('/token')
+      .expect(200, function (err, res) {
+        if (err) return done(err)
+        request(app)
+        .get('/check-token')
+        .set('Cookie', cookie)
+        .set('OAUTH-STATE', String(res.text))
+        .expect(403, 'session has expired or form tampered with', done)
+      })
+    });
+  })
+
   describe('when using session storage', function () {
     var app
     before(function () {

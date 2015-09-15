@@ -37,7 +37,9 @@ var csurf = require('csurf')
 Create a middleware for CSRF token creation and validation. This middleware
 adds a `req.csrfToken()` function to make a token which should be added to
 requests which mutate state, within a hidden form field, query-string etc.
-This token is validated against the visitor's session or csrf cookie.
+This token is validated against the visitor's session or csrf cookie. It
+also adds a `req.verifyToken(token)` function used to verify a token
+(for example, when retrieving state from an oauth callback).
 
 #### Options
 
@@ -221,6 +223,36 @@ app.use(function (err, req, res, next) {
   res.status(403)
   res.send('form tampered with')
 })
+```
+
+### Verifying a token
+
+If you need to pass the token in a query string rather than an
+HTTP header, you can use the `req.verifyToken(token)` function
+provided by this middleware. This is useful when you want to
+use this library with an oauth callback.
+
+```js
+var csrf = require('csurf')
+var express = require('express')
+
+var app = express()
+app.use(csrf())
+
+app.get('/oauth_callback', function(req, res) {
+  try {
+    req.verifyToken(req.query.state); // throws
+    res.status(200);
+    res.send('Token Passed');
+  } catch(err) {
+    if (err.code !== 'EBADCSRFTOKEN') throw err;
+
+    // handle CSRF token errors here
+    res.status(403)
+    res.send('form tampered with')
+  }
+});
+
 ```
 
 ## License
