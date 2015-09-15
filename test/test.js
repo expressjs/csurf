@@ -324,9 +324,10 @@ describe('csurf', function () {
   })
 
   describe('req.verifyToken()', function () {
-    var app, token, cookie;
     beforeEach(function(done) {
-      app = connect()
+      var _this = this
+      var app = connect()
+      this.app = app
       app.use(session({ keys: ['a', 'b'] }))
       app.use(bodyParser.urlencoded({ extended: false }))
       app.use(csurf())
@@ -346,34 +347,34 @@ describe('csurf', function () {
       .get('/token')
       .expect(200, function (err, res) {
         if (err) return done(err)
-        token = res.text
-        cookie = cookies(res)
+        _this.token = res.text
+        _this.cookie = cookies(res)
         done()
       })
 
     })
     it('should pass on valid tokens', function (done) {
-      request(app)
+      request(this.app)
       .get('/check-token')
-      .set('OAUTH-STATE', String(token))
-      .set('Cookie', cookie)
+      .set('OAUTH-STATE', String(this.token))
+      .set('Cookie', this.cookie)
       .expect(200, 'PASS', done)
     })
     it('should throw on invalid tokens', function (done) {
-      request(app)
+      request(this.app)
       .get('/check-token')
-      .set('Cookie', cookie)
-      .set('OAUTH-STATE', String(token + 'p'))
+      .set('Cookie', this.cookie)
+      .set('OAUTH-STATE', String(this.token + 'p'))
       .expect(403, 'session has expired or form tampered with', done)
     })
     it('should throw on attempting someone else\'s token', function(done) {
-      request(app)
+      request(this.app)
       .get('/token')
       .expect(200, function (err, res) {
         if (err) return done(err)
-        request(app)
+        request(this.app)
         .get('/check-token')
-        .set('Cookie', cookie)
+        .set('Cookie', this.cookie)
         .set('OAUTH-STATE', String(res.text))
         .expect(403, 'session has expired or form tampered with', done)
       })
