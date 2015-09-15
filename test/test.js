@@ -324,7 +324,7 @@ describe('csurf', function () {
   })
 
   describe('req.verifyToken()', function () {
-    beforeEach(function(done) {
+    before(function(done) {
       var _this = this
       var app = connect()
       this.app = app
