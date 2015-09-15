@@ -323,7 +323,7 @@ describe('csurf', function () {
     })
   })
 
-  describe.only('req.verifyToken()', function () {
+  describe('req.verifyToken()', function () {
     var app, token, cookie;
     beforeEach(function(done) {
       app = connect()
