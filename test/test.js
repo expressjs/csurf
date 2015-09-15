@@ -329,7 +329,6 @@ describe('csurf', function () {
       var app = connect()
       this.app = app
       app.use(session({ keys: ['a', 'b'] }))
-      app.use(bodyParser.urlencoded({ extended: false }))
       app.use(csurf())
       app.use('/token', function(req, res) {
         res.end(req.csrfToken())
