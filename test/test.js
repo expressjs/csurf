@@ -362,13 +362,14 @@ describe('csurf', function () {
       .expect(200, 'FAIL', done)
     })
     it('should throw on attempting someone else\'s token', function(done) {
+      var _this = this;
       request(this.app)
       .get('/token')
       .expect(200, function (err, res) {
         if (err) return done(err)
-        request(this.app)
+        request(_this.app)
         .get('/check-token')
-        .set('Cookie', this.cookie)
+        .set('Cookie', _this.cookie)
         .set('OAUTH-STATE', String(res.text))
         .expect(200, 'FAIL', done)
       })
