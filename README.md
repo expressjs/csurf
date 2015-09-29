@@ -146,9 +146,14 @@ input field named `_csrf`:
 
 ### Ignoring Routes
 
-CSRF should be disabled for API areas of websites where requests are all
-going to be fully authenticated and should be rate limited. The following
-is an example of how to ignore API routing using routers & express.
+**Note** CSRF checks should only be disabled for requests that you expect to
+come from outside of your website. Do not disable CSRF checks for requests
+that you expect to only come from your website. An existing session, even if
+it belongs to an authenticated user, is not enough to protect against CSRF
+attacks.
+
+The following is an example of how to order your routes so that certain endpoints
+do not check for a valid CSRF token.
 
 ```js
 var cookieParser = require('cookie-parser')
