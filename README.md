@@ -146,10 +146,10 @@ input field named `_csrf`:
 
 ### Ignoring Routes
 
-CSRF checks should only be disabled for use cases where you expect requests to
-come from places other than your website. Please be sure to understand CSRF
-attacks before disabling CSRF checks. An existing session (authenticated or
-not) is not enough to prevent CSRF attacks.
+CSRF checks should only be disabled for requests that you expect to
+come from outside of your website. *Do not disable CSRF checks for requests
+that you expect to only come from your website*. An existing session, even if it belongs
+to an authenticated user, is not enough to protect against CSRF attacks.
 
 The following is an example of how to order your routes so that certain endpoints
 do not check for a valid CSRF token.
