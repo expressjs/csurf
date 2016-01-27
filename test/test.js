@@ -277,6 +277,25 @@ describe('csurf', function () {
     })
   })
 
+  it('should use connect conventions with throwErrors set to false', function(done) {
+    var app = connect()
+    app.use(function(req, res, next) {
+      csurf({ throwErrors: false })(req, res, function(err){
+        if (err === undefined) {
+          res.end('It worked!');
+        } else {
+          // Error got passed as expected.
+          res.statusCode = 403;
+          res.end('error');
+        }
+      });
+    });
+
+    request(app)
+        .post('/')
+        .expect(403, done);
+  });
+
   describe('with "sessionKey" option', function () {
     it('should use the specified sessionKey', function (done) {
       var app = connect()
