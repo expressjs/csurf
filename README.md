@@ -97,6 +97,12 @@ locations, in order:
   - `req.headers['x-csrf-token']` - the `X-CSRF-Token` HTTP request header.
   - `req.headers['x-xsrf-token']` - the `X-XSRF-Token` HTTP request header.
 
+##### throwErrors
+
+Throw errors instead of using the more common `next(err)` in connect-style. 
+Although the default is `true` to ensure backwards compatibility, you'll
+likely want `false` instead.
+
 ## Example
 
 ### Simple express example
