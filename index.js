@@ -41,6 +41,12 @@ module.exports = function csurf(options) {
   // get value getter
   var value = options.value || defaultValue
 
+  /*
+   * Throw errors if true. Else use recommended connect pattern: next(err).
+   * Defaults to true for backwards compatibility.
+   */
+  var throwErrors = (options.throwErrors === undefined) || options.throwErrors;
+
   // token repo
   var tokens = new Tokens(options);
 
@@ -57,47 +63,55 @@ module.exports = function csurf(options) {
   var ignoreMethod = getIgnoredMethods(ignoreMethods)
 
   return function csrf(req, res, next) {
-    var secret = getsecret(req, sessionKey, cookie)
-    var token
+    try {
+      var secret = getsecret(req, sessionKey, cookie)
+      var token
 
-    // lazy-load token getter
-    req.csrfToken = function csrfToken() {
-      var sec = !cookie
-        ? getsecret(req, sessionKey, cookie)
-        : secret
+      // lazy-load token getter
+      req.csrfToken = function csrfToken(){
+        var sec = !cookie
+            ? getsecret(req, sessionKey, cookie)
+            : secret
 
-      // use cached token if secret has not changed
-      if (token && sec === secret) {
+        // use cached token if secret has not changed
+        if (token && sec === secret) {
+          return token
+        }
+
+        // generate & set new secret
+        if (sec === undefined) {
+          sec = tokens.secretSync()
+          setsecret(req, res, sessionKey, sec, cookie)
+        }
+
+        // update changed secret
+        secret = sec
+
+        // create new token
+        token = tokens.create(secret)
+
         return token
       }
 
-      // generate & set new secret
-      if (sec === undefined) {
-        sec = tokens.secretSync()
-        setsecret(req, res, sessionKey, sec, cookie)
+      // generate & set secret
+      if (!secret) {
+        secret = tokens.secretSync()
+        setsecret(req, res, sessionKey, secret, cookie)
       }
 
-      // update changed secret
-      secret = sec
+      // verify the incoming token
+      if (!ignoreMethod[req.method]) {
+        verifytoken(req, tokens, secret, value(req))
+      }
 
-      // create new token
-      token = tokens.create(secret)
-
-      return token
+      next()
+    } catch (err) {
+      if(throwErrors) {
+        throw err;
+      } else {
+        next(err);
+      }
     }
-
-    // generate & set secret
-    if (!secret) {
-      secret = tokens.secretSync()
-      setsecret(req, res, sessionKey, secret, cookie)
-    }
-
-    // verify the incoming token
-    if (!ignoreMethod[req.method]) {
-      verifytoken(req, tokens, secret, value(req))
-    }
-
-    next()
   }
 };
 
