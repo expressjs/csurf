@@ -7,6 +7,9 @@ unreleased
     - Throw better error for invalid argument to parse
     - Throw on invalid values provided to `serialize`
     - perf: hoist regular expression
+  * deps: csrf@~3.0.1
+    - deps: rndm@1.2.0
+    - deps: uid-safe@2.1.0
 
 1.8.3 / 2015-06-10
 ==================
