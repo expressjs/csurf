@@ -10,6 +10,10 @@ unreleased
   * deps: csrf@~3.0.1
     - deps: rndm@1.2.0
     - deps: uid-safe@2.1.0
+  * deps: http-errors@~1.4.0
+    - Add `HttpError` export, for `err instanceof createError.HttpError`
+    - deps: inherits@2.0.1
+    - deps: statuses@'>= 1.2.1 < 2'
 
 1.8.3 / 2015-06-10
 ==================
