@@ -1,3 +1,13 @@
+unreleased
+==========
+
+  * deps: cookie@0.2.3
+    - Add `firstPartyOnly` option
+    - Fix cookie `Max-Age` to never be a floating point number
+    - Throw better error for invalid argument to parse
+    - Throw on invalid values provided to `serialize`
+    - perf: hoist regular expression
+
 1.8.3 / 2015-06-10
 ==================
 
