@@ -21,7 +21,7 @@
     "cookie-session": "~1.1.0",
     "istanbul": "0.4.2",
     "mocha": "2.4.5",
-    "supertest": "1.0.1"
+    "supertest": "1.1.0"
   },
   "engines": {
     "node": ">= 0.8.0"
