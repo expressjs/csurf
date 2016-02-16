@@ -161,16 +161,8 @@ var csrf = require('csurf')
 var bodyParser = require('body-parser')
 var express = require('express')
 
-// setup route middlewares
-var csrfProtection = csrf({ cookie: true })
-var parseForm = bodyParser.urlencoded({ extended: false })
-
 // create express app
 var app = express()
-
-// parse cookies
-// we need this because "cookie" is true in csrfProtection
-app.use(cookieParser())
 
 // create api router
 var api = createApiRouter()
@@ -178,15 +170,17 @@ var api = createApiRouter()
 // mount api before csrf is appended to the app stack
 app.use('/api', api)
 
-// now add csrf, after the "/api" was mounted
-app.use(csrfProtection)
+// now add csrf and other middlewares, after the "/api" was mounted
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(cookieParser())
+app.use(csrf({ cookie: true }))
 
 app.get('/form', function(req, res) {
   // pass the csrfToken to the view
   res.render('send', { csrfToken: req.csrfToken() })
 })
 
-app.post('/process', parseForm, function(req, res) {
+app.post('/process', function(req, res) {
   res.send('csrf was required to get here')
 })
 
