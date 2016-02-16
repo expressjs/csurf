@@ -15,6 +15,7 @@ unreleased
     - deps: inherits@2.0.1
     - deps: statuses@'>= 1.2.1 < 2'
   * perf: enable strict mode
+  * perf: remove argument reassignment
 
 1.8.3 / 2015-06-10
 ==================

@@ -32,24 +32,24 @@ var Tokens = require('csrf');
  */
 
 module.exports = function csurf(options) {
-  options = options || {};
+  var opts = options || {}
 
   // get cookie options
-  var cookie = getCookieOptions(options.cookie)
+  var cookie = getCookieOptions(opts.cookie)
 
   // get session options
-  var sessionKey = options.sessionKey || 'session'
+  var sessionKey = opts.sessionKey || 'session'
 
   // get value getter
-  var value = options.value || defaultValue
+  var value = opts.value || defaultValue
 
   // token repo
-  var tokens = new Tokens(options);
+  var tokens = new Tokens(opts)
 
   // ignored methods
-  var ignoreMethods = options.ignoreMethods === undefined
+  var ignoreMethods = opts.ignoreMethods === undefined
     ? ['GET', 'HEAD', 'OPTIONS']
-    : options.ignoreMethods
+    : opts.ignoreMethods
 
   if (!Array.isArray(ignoreMethods)) {
     throw new TypeError('option ignoreMethods must be an array')
