@@ -1,5 +1,5 @@
-unreleased
-==========
+1.9.0 / 2016-02-15
+==================
 
   * deps: cookie@0.2.3
     - Add `firstPartyOnly` option
