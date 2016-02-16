@@ -15,7 +15,7 @@
     "http-errors": "~1.4.0"
   },
   "devDependencies": {
-    "body-parser": "1.14.2",
+    "body-parser": "1.15.0",
     "connect": "3.4.1",
     "cookie-parser": "1.4.1",
     "cookie-session": "~1.1.0",
