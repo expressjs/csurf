@@ -14,6 +14,7 @@ unreleased
     - Add `HttpError` export, for `err instanceof createError.HttpError`
     - deps: inherits@2.0.1
     - deps: statuses@'>= 1.2.1 < 2'
+  * perf: enable strict mode
 
 1.8.3 / 2015-06-10
 ==================
