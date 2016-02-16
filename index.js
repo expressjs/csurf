@@ -95,8 +95,10 @@ module.exports = function csurf(options) {
     }
 
     // verify the incoming token
-    if (!ignoreMethod[req.method]) {
-      verifytoken(req, tokens, secret, value(req))
+    if (!ignoreMethod[req.method] && !tokens.verify(secret, value(req))) {
+      return next(createError(403, 'invalid csrf token', {
+        code: 'EBADCSRFTOKEN'
+      }))
     }
 
     next()
@@ -252,24 +254,5 @@ function setsecret(req, res, sessionKey, val, cookie) {
   } else {
     /* istanbul ignore next: should never actually run */
     throw new Error('misconfigured csrf')
-  }
-}
-
-/**
- * Verify the token.
- *
- * @param {IncomingMessage} req
- * @param {Object} tokens
- * @param {string} secret
- * @param {string} val
- * @api private
- */
-
-function verifytoken(req, tokens, secret, val) {
-  // valid token
-  if (!tokens.verify(secret, val)) {
-    throw createError(403, 'invalid csrf token', {
-      code: 'EBADCSRFTOKEN'
-    });
   }
 }

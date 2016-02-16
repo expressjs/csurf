@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+  * Pass invalid csrf token error to `next()` instead of throwing
   * deps: cookie@0.2.3
     - Add `firstPartyOnly` option
     - Fix cookie `Max-Age` to never be a floating point number
