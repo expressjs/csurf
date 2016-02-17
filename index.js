@@ -88,6 +88,10 @@ module.exports = function csurf(options) {
       return token
     }
 
+    req.isTokenValid = function isTokenValid(token) {
+      return isvalid(tokens, secret, token);
+    };
+
     // generate & set secret
     if (!secret) {
       secret = tokens.secretSync()
@@ -267,9 +271,13 @@ function setsecret(req, res, sessionKey, val, cookie) {
 
 function verifytoken(req, tokens, secret, val) {
   // valid token
-  if (!tokens.verify(secret, val)) {
+  if (!isvalid(tokens, secret, val)) {
     throw createError(403, 'invalid csrf token', {
       code: 'EBADCSRFTOKEN'
     });
   }
+}
+
+function isvalid(tokens, secret, val) {
+  return tokens.verify(secret, val);
 }

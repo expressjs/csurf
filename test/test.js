@@ -323,6 +323,59 @@ describe('csurf', function () {
     })
   })
 
+  describe('req.isTokenValid()', function () {
+    before(function(done) {
+      var _this = this
+      var app = connect()
+      this.app = app
+      app.use(session({ keys: ['a', 'b'] }))
+      app.use(csurf())
+      app.use('/token', function(req, res) {
+        res.end(req.csrfToken())
+      })
+      app.use('/check-token', function(req, res) {
+        var isValid = req.isTokenValid(req.headers['oauth-state'])
+        res.end(isValid ? 'PASS' : 'FAIL')
+      });
+      request(app)
+      .get('/token')
+      .expect(200, function (err, res) {
+        if (err) return done(err)
+        _this.token = res.text
+        _this.cookie = cookies(res)
+        done()
+      })
+
+    })
+    it('should pass on valid tokens', function (done) {
+      request(this.app)
+      .get('/check-token')
+      .set('OAUTH-STATE', String(this.token))
+      .set('Cookie', this.cookie)
+      .expect(200, 'PASS', done)
+    })
+    it('should throw on invalid tokens', function (done) {
+      request(this.app)
+      .get('/check-token')
+      .set('Cookie', this.cookie)
+      .set('OAUTH-STATE', String(this.token + 'p'))
+      .expect(200, 'FAIL', done)
+    })
+    it('should throw on attempting someone else\'s token', function(done) {
+      var _this = this;
+      request(this.app)
+      .get('/token')
+      .expect(200, function (err, res) {
+        if (err) return done(err)
+        request(_this.app)
+        .get('/check-token')
+        .set('Cookie', _this.cookie)
+        .set('OAUTH-STATE', String(res.text))
+        .expect(200, 'FAIL', done)
+      })
+    });
+  })
+
   describe('when using session storage', function () {
     var app
     before(function () {
