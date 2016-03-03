@@ -97,6 +97,24 @@ locations, in order:
   - `req.headers['x-csrf-token']` - the `X-CSRF-Token` HTTP request header.
   - `req.headers['x-xsrf-token']` - the `X-XSRF-Token` HTTP request header.
 
+### Split Token Generation/Validation
+
+Token generation and verification can be performed in separate steps.
+
+#### csurf.generator([options])
+
+Create a middleware which adds two functions to the `req` object:
+`req.csrfToken()` for generating a token and `req.verifyToken()` for
+validating the token from the request. It takes the same
+[`options`](#options) as the combined `csurf` middleware.
+
+#### csurf.validator([options])
+
+Create a middleware which calls `req.verifyToken()` to perform the token
+validation. Note that `csurf.generator()` must be called earlier in the
+middleware stack so that `req.verifyToken()` is defined. The only `options`
+it takes is [`ignoreMethods`](#ignoremethods).
+
 ## Example
 
 ### Simple express example
