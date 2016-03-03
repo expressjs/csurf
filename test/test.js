@@ -1,13 +1,13 @@
 
 process.env.NODE_ENV = 'test';
 
+var assert = require('assert');
 var connect = require('connect');
 var http = require('http')
 var session = require('cookie-session');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var request = require('supertest');
-var should = require('should')
 var url = require('url')
 
 var csurf = require('..')
@@ -42,6 +42,40 @@ describe('csurf', function () {
       request(server)
       .post('/?_csrf=' + encodeURIComponent(token))
       .set('Cookie', cookies(res))
+      .expect(200, done)
+    });
+  });
+
+  it('should work in csrf-token header', function(done) {
+    var server = createServer()
+
+    request(server)
+    .get('/')
+    .expect(200, function (err, res) {
+      if (err) return done(err)
+      var token = res.text;
+
+      request(server)
+      .post('/')
+      .set('Cookie', cookies(res))
+      .set('csrf-token', token)
+      .expect(200, done)
+    });
+  });
+
+  it('should work in xsrf-token header', function(done) {
+    var server = createServer()
+
+    request(server)
+    .get('/')
+    .expect(200, function (err, res) {
+      if (err) return done(err)
+      var token = res.text;
+
+      request(server)
+      .post('/')
+      .set('Cookie', cookies(res))
+      .set('xsrf-token', token)
       .expect(200, done)
     });
   });
@@ -87,9 +121,11 @@ describe('csurf', function () {
     .get('/')
     .expect(200, function (err, res) {
       if (err) return done(err)
-      var token = res.text;
+      var data = cookie(res, '_csrf')
+      var token = res.text
 
-      res.headers['set-cookie'][0].split('=')[0].should.equal('_csrf');
+      assert.ok(Boolean(data))
+      assert.ok(/; *path=\/(?:;|$)/i.test(data))
 
       request(server)
       .post('/')
@@ -106,9 +142,11 @@ describe('csurf', function () {
     .get('/')
     .expect(200, function (err, res) {
       if (err) return done(err)
-      var token = res.text;
+      var data = cookie(res, '_customcsrf')
+      var token = res.text
 
-      res.headers['set-cookie'][0].split('=')[0].should.equal('_customcsrf');
+      assert.ok(Boolean(data))
+      assert.ok(/; *path=\/(?:;|$)/i.test(data))
 
       request(server)
       .post('/')
@@ -214,7 +252,7 @@ describe('csurf', function () {
 
   describe('with "ignoreMethods" option', function () {
     it('should reject invalid value', function () {
-      createServer.bind(null, {ignoreMethods: 'tj'}).should.throw(/option ignoreMethods/)
+      assert.throws(createServer.bind(null, {ignoreMethods: 'tj'}), /option ignoreMethods/)
     })
 
     it('should not check token on given methods', function (done) {
@@ -235,6 +273,35 @@ describe('csurf', function () {
           .set('Cookie', cookie)
           .expect(403, done)
         })
+      })
+    })
+  })
+
+  describe('with "sessionKey" option', function () {
+    it('should use the specified sessionKey', function (done) {
+      var app = connect()
+      var sess = {}
+
+      app.use(function (req, res, next) {
+        req.mySession = sess
+        next()
+      })
+      app.use(bodyParser.urlencoded({ extended: false }))
+      app.use(csurf({ sessionKey: 'mySession' }))
+      app.use(function (req, res, next) {
+        res.end(req.csrfToken() || 'none')
+      })
+
+      request(app)
+      .get('/')
+      .expect(200, function (err, res) {
+        if (err) return done(err)
+        var token = res.text;
+
+        request(app)
+        .post('/')
+        .send('_csrf=' + encodeURIComponent(token))
+        .expect(200, done)
       })
     })
   })
@@ -313,10 +380,16 @@ describe('csurf', function () {
   })
 });
 
-function cookies(req) {
-  return req.headers['set-cookie'].map(function (cookies) {
-    return cookies.split(';')[0];
-  }).join(';');
+function cookie(res, name) {
+  return res.headers['set-cookie'].filter(function (cookies) {
+    return cookies.split('=')[0] === name
+  })[0]
+}
+
+function cookies(res) {
+  return res.headers['set-cookie'].map(function (cookies) {
+    return cookies.split(';')[0]
+  }).join(';')
 }
 
 function createServer(opts) {
