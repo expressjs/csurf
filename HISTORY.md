@@ -2,12 +2,15 @@ unreleased
 ==========
 
   * Pass invalid csrf token error to `next()` instead of throwing
-  * deps: cookie@0.2.3
+  * deps: cookie@0.2.4
     - Add `firstPartyOnly` option
     - Fix cookie `Max-Age` to never be a floating point number
     - Throw better error for invalid argument to parse
     - Throw on invalid values provided to `serialize`
+    - perf: enable strict mode
     - perf: hoist regular expression
+    - perf: use for loop in parse
+    - perf: use string concatination for serialization
   * deps: csrf@~3.0.1
     - deps: rndm@1.2.0
     - deps: uid-safe@2.1.0
