@@ -66,6 +66,12 @@ function csurf (options) {
   var ignoreMethod = getIgnoredMethods(ignoreMethods)
 
   return function csrf (req, res, next) {
+    // validate the configuration against request
+    if (!verifyConfiguration(req, sessionKey, cookie)) {
+      return next(new Error('misconfigured csrf'))
+    }
+
+    // get the secret from the request
     var secret = getSecret(req, sessionKey, cookie)
     var token
 
@@ -190,28 +196,40 @@ function getIgnoredMethods (methods) {
  */
 
 function getSecret (req, sessionKey, cookie) {
-  var bag
-  var key
+  // get the bag & key
+  var bag = getSecretBag(req, sessionKey, cookie)
+  var key = cookie ? cookie.key : 'csrfSecret'
 
+  if (!bag) {
+    /* istanbul ignore next: should never actually run */
+    throw new Error('misconfigured csrf')
+  }
+
+  // return secret from bag
+  return bag[key]
+}
+
+/**
+ * Get the token secret bag from the request.
+ *
+ * @param {IncomingMessage} req
+ * @param {String} sessionKey
+ * @param {Object} [cookie]
+ * @api private
+ */
+
+function getSecretBag (req, sessionKey, cookie) {
   if (cookie) {
     // get secret from cookie
     var cookieKey = cookie.signed
       ? 'signedCookies'
       : 'cookies'
 
-    bag = req[cookieKey]
-    key = cookie.key
+    return req[cookieKey]
   } else {
     // get secret from session
-    bag = req[sessionKey]
-    key = 'csrfSecret'
+    return req[sessionKey]
   }
-
-  if (!bag) {
-    throw new Error('misconfigured csrf')
-  }
-
-  return bag[key]
 }
 
 /**
@@ -253,7 +271,8 @@ function setSecret (req, res, sessionKey, val, cookie) {
       var secret = req.secret
 
       if (!secret) {
-        throw new Error('cookieParser("secret") required for signed cookies')
+        /* istanbul ignore next: should never actually run */
+        throw new Error('misconfigured csrf')
       }
 
       val = 's:' + sign(val, secret)
@@ -267,4 +286,21 @@ function setSecret (req, res, sessionKey, val, cookie) {
     /* istanbul ignore next: should never actually run */
     throw new Error('misconfigured csrf')
   }
+}
+
+/**
+ * Verify the configuration against the request.
+ * @private
+ */
+
+function verifyConfiguration (req, sessionKey, cookie) {
+  if (!getSecretBag(req, sessionKey, cookie)) {
+    return false
+  }
+
+  if (cookie && cookie.signed && !req.secret) {
+    return false
+  }
+
+  return true
 }

@@ -257,7 +257,7 @@ describe('csurf', function () {
 
     request(app)
     .get('/')
-    .expect(500, /cookieParser.*secret/, done)
+    .expect(500, /misconfigured csrf/, done)
   })
 
   describe('with "ignoreMethods" option', function () {

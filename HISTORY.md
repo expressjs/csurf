@@ -2,6 +2,7 @@ unreleased
 ==========
 
   * Pass invalid csrf token error to `next()` instead of throwing
+  * Pass misconfigured error to `next()` instead of throwing
   * Provide misconfigured error when using cookies without cookie-parser
   * deps: cookie@0.2.4
     - Add `firstPartyOnly` option
