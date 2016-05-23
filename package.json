@@ -11,7 +11,7 @@
   "dependencies": {
     "cookie": "0.2.4",
     "cookie-signature": "1.0.6",
-    "csrf": "~3.0.1",
+    "csrf": "~3.0.2",
     "http-errors": "~1.4.0"
   },
   "devDependencies": {

@@ -11,9 +11,11 @@ unreleased
     - perf: hoist regular expression
     - perf: use for loop in parse
     - perf: use string concatination for serialization
-  * deps: csrf@~3.0.1
+  * deps: csrf@~3.0.2
+    - Use `tsscmp` module for timing-safe token verification
+    - deps: base64-url@1.2.2
     - deps: rndm@1.2.0
-    - deps: uid-safe@2.1.0
+    - deps: uid-safe@2.1.1
   * deps: http-errors@~1.4.0
     - Add `HttpError` export, for `err instanceof createError.HttpError`
     - deps: inherits@2.0.1
