@@ -229,10 +229,20 @@ describe('csurf', function () {
     })
   })
 
-  it('should error without secret storage', function (done) {
+  it('should error without session secret storage', function (done) {
     var app = connect()
 
     app.use(csurf())
+
+    request(app)
+    .get('/')
+    .expect(500, /misconfigured csrf/, done)
+  })
+
+  it('should error without cookie secret storage', function (done) {
+    var app = connect()
+
+    app.use(csurf({ cookie: true }))
 
     request(app)
     .get('/')

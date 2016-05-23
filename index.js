@@ -190,23 +190,28 @@ function getIgnoredMethods (methods) {
  */
 
 function getsecret (req, sessionKey, cookie) {
-  var secret
+  var bag
+  var key
 
   if (cookie) {
     // get secret from cookie
-    var bag = cookie.signed
+    var cookieKey = cookie.signed
       ? 'signedCookies'
       : 'cookies'
 
-    secret = req[bag][cookie.key]
-  } else if (req[sessionKey]) {
-    // get secret from session
-    secret = req[sessionKey].csrfSecret
+    bag = req[cookieKey]
+    key = cookie.key
   } else {
+    // get secret from session
+    bag = req[sessionKey]
+    key = 'csrfSecret'
+  }
+
+  if (!bag) {
     throw new Error('misconfigured csrf')
   }
 
-  return secret
+  return bag[key]
 }
 
 /**
