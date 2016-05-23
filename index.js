@@ -66,13 +66,13 @@ function csurf (options) {
   var ignoreMethod = getIgnoredMethods(ignoreMethods)
 
   return function csrf (req, res, next) {
-    var secret = getsecret(req, sessionKey, cookie)
+    var secret = getSecret(req, sessionKey, cookie)
     var token
 
     // lazy-load token getter
     req.csrfToken = function csrfToken () {
       var sec = !cookie
-        ? getsecret(req, sessionKey, cookie)
+        ? getSecret(req, sessionKey, cookie)
         : secret
 
       // use cached token if secret has not changed
@@ -83,7 +83,7 @@ function csurf (options) {
       // generate & set new secret
       if (sec === undefined) {
         sec = tokens.secretSync()
-        setsecret(req, res, sessionKey, sec, cookie)
+        setSecret(req, res, sessionKey, sec, cookie)
       }
 
       // update changed secret
@@ -98,7 +98,7 @@ function csurf (options) {
     // generate & set secret
     if (!secret) {
       secret = tokens.secretSync()
-      setsecret(req, res, sessionKey, secret, cookie)
+      setSecret(req, res, sessionKey, secret, cookie)
     }
 
     // verify the incoming token
@@ -189,7 +189,7 @@ function getIgnoredMethods (methods) {
  * @api private
  */
 
-function getsecret (req, sessionKey, cookie) {
+function getSecret (req, sessionKey, cookie) {
   var bag
   var key
 
@@ -224,7 +224,7 @@ function getsecret (req, sessionKey, cookie) {
  * @api private
  */
 
-function setcookie (res, name, val, options) {
+function setCookie (res, name, val, options) {
   var data = Cookie.serialize(name, val, options)
 
   var prev = res.getHeader('set-cookie') || []
@@ -246,7 +246,7 @@ function setcookie (res, name, val, options) {
  * @api private
  */
 
-function setsecret (req, res, sessionKey, val, cookie) {
+function setSecret (req, res, sessionKey, val, cookie) {
   if (cookie) {
     // set secret on cookie
     if (cookie.signed) {
@@ -259,7 +259,7 @@ function setsecret (req, res, sessionKey, val, cookie) {
       val = 's:' + sign(val, secret)
     }
 
-    setcookie(res, cookie.key, val, cookie)
+    setCookie(res, cookie.key, val, cookie)
   } else if (req[sessionKey]) {
     // set secret on session
     req[sessionKey].csrfSecret = val
