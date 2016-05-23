@@ -16,10 +16,13 @@ unreleased
     - deps: base64-url@1.2.2
     - deps: rndm@1.2.0
     - deps: uid-safe@2.1.1
-  * deps: http-errors@~1.4.0
+  * deps: http-errors@~1.5.0
     - Add `HttpError` export, for `err instanceof createError.HttpError`
+    - Support new code `421 Misdirected Request`
+    - Use `setprototypeof` module to replace `__proto__` setting
     - deps: inherits@2.0.1
-    - deps: statuses@'>= 1.2.1 < 2'
+    - deps: statuses@'>= 1.3.0 < 2'
+    - perf: enable strict mode
   * perf: enable strict mode
   * perf: remove argument reassignment
 
