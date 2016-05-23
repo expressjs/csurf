@@ -13,10 +13,17 @@
  * @private
  */
 
-var Cookie = require('cookie');
-var createError = require('http-errors');
-var sign = require('cookie-signature').sign;
-var Tokens = require('csrf');
+var Cookie = require('cookie')
+var createError = require('http-errors')
+var sign = require('cookie-signature').sign
+var Tokens = require('csrf')
+
+/**
+ * Module exports.
+ * @public
+ */
+
+module.exports = csurf
 
 /**
  * CSRF protection middleware.
@@ -28,10 +35,10 @@ var Tokens = require('csrf');
  *
  * @param {Object} options
  * @return {Function} middleware
- * @api public
+ * @public
  */
 
-module.exports = function csurf(options) {
+function csurf (options) {
   var opts = options || {}
 
   // get cookie options
@@ -58,12 +65,12 @@ module.exports = function csurf(options) {
   // generate lookup
   var ignoreMethod = getIgnoredMethods(ignoreMethods)
 
-  return function csrf(req, res, next) {
+  return function csrf (req, res, next) {
     var secret = getsecret(req, sessionKey, cookie)
     var token
 
     // lazy-load token getter
-    req.csrfToken = function csrfToken() {
+    req.csrfToken = function csrfToken () {
       var sec = !cookie
         ? getsecret(req, sessionKey, cookie)
         : secret
@@ -103,7 +110,7 @@ module.exports = function csurf(options) {
 
     next()
   }
-};
+}
 
 /**
  * Default value function, checking the `req.body`
@@ -114,13 +121,13 @@ module.exports = function csurf(options) {
  * @api private
  */
 
-function defaultValue(req) {
-  return (req.body && req.body._csrf)
-    || (req.query && req.query._csrf)
-    || (req.headers['csrf-token'])
-    || (req.headers['xsrf-token'])
-    || (req.headers['x-csrf-token'])
-    || (req.headers['x-xsrf-token']);
+function defaultValue (req) {
+  return (req.body && req.body._csrf) ||
+    (req.query && req.query._csrf) ||
+    (req.headers['csrf-token']) ||
+    (req.headers['xsrf-token']) ||
+    (req.headers['x-csrf-token']) ||
+    (req.headers['x-xsrf-token'])
 }
 
 /**
@@ -131,7 +138,7 @@ function defaultValue(req) {
  * @api private
  */
 
-function getCookieOptions(options) {
+function getCookieOptions (options) {
   if (options !== true && typeof options !== 'object') {
     return undefined
   }
@@ -162,7 +169,7 @@ function getCookieOptions(options) {
  * @api private
  */
 
-function getIgnoredMethods(methods) {
+function getIgnoredMethods (methods) {
   var obj = Object.create(null)
 
   for (var i = 0; i < methods.length; i++) {
@@ -182,7 +189,7 @@ function getIgnoredMethods(methods) {
  * @api private
  */
 
-function getsecret(req, sessionKey, cookie) {
+function getsecret (req, sessionKey, cookie) {
   var secret
 
   if (cookie) {
@@ -212,15 +219,15 @@ function getsecret(req, sessionKey, cookie) {
  * @api private
  */
 
-function setcookie(res, name, val, options) {
-  var data = Cookie.serialize(name, val, options);
+function setcookie (res, name, val, options) {
+  var data = Cookie.serialize(name, val, options)
 
-  var prev = res.getHeader('set-cookie') || [];
+  var prev = res.getHeader('set-cookie') || []
   var header = Array.isArray(prev) ? prev.concat(data)
     : Array.isArray(data) ? [prev].concat(data)
-    : [prev, data];
+    : [prev, data]
 
-  res.setHeader('set-cookie', header);
+  res.setHeader('set-cookie', header)
 }
 
 /**
@@ -234,7 +241,7 @@ function setcookie(res, name, val, options) {
  * @api private
  */
 
-function setsecret(req, res, sessionKey, val, cookie) {
+function setsecret (req, res, sessionKey, val, cookie) {
   if (cookie) {
     // set secret on cookie
     if (cookie.signed) {
@@ -247,7 +254,7 @@ function setsecret(req, res, sessionKey, val, cookie) {
       val = 's:' + sign(val, secret)
     }
 
-    setcookie(res, cookie.key, val, cookie);
+    setcookie(res, cookie.key, val, cookie)
   } else if (req[sessionKey]) {
     // set secret on session
     req[sessionKey].csrfSecret = val

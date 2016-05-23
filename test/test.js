@@ -1,120 +1,120 @@
 
-process.env.NODE_ENV = 'test';
+process.env.NODE_ENV = 'test'
 
-var assert = require('assert');
-var connect = require('connect');
+var assert = require('assert')
+var connect = require('connect')
 var http = require('http')
-var session = require('cookie-session');
-var bodyParser = require('body-parser');
-var cookieParser = require('cookie-parser');
-var request = require('supertest');
+var session = require('cookie-session')
+var bodyParser = require('body-parser')
+var cookieParser = require('cookie-parser')
+var request = require('supertest')
 var url = require('url')
 
 var csurf = require('..')
 
 describe('csurf', function () {
-  it('should work in req.body', function(done) {
+  it('should work in req.body', function (done) {
     var server = createServer()
 
     request(server)
     .get('/')
     .expect(200, function (err, res) {
       if (err) return done(err)
-      var token = res.text;
+      var token = res.text
 
       request(server)
       .post('/')
       .set('Cookie', cookies(res))
       .send('_csrf=' + encodeURIComponent(token))
       .expect(200, done)
-    });
-  });
+    })
+  })
 
-  it('should work in req.query', function(done) {
+  it('should work in req.query', function (done) {
     var server = createServer()
 
     request(server)
     .get('/')
     .expect(200, function (err, res) {
       if (err) return done(err)
-      var token = res.text;
+      var token = res.text
 
       request(server)
       .post('/?_csrf=' + encodeURIComponent(token))
       .set('Cookie', cookies(res))
       .expect(200, done)
-    });
-  });
+    })
+  })
 
-  it('should work in csrf-token header', function(done) {
+  it('should work in csrf-token header', function (done) {
     var server = createServer()
 
     request(server)
     .get('/')
     .expect(200, function (err, res) {
       if (err) return done(err)
-      var token = res.text;
+      var token = res.text
 
       request(server)
       .post('/')
       .set('Cookie', cookies(res))
       .set('csrf-token', token)
       .expect(200, done)
-    });
-  });
+    })
+  })
 
-  it('should work in xsrf-token header', function(done) {
+  it('should work in xsrf-token header', function (done) {
     var server = createServer()
 
     request(server)
     .get('/')
     .expect(200, function (err, res) {
       if (err) return done(err)
-      var token = res.text;
+      var token = res.text
 
       request(server)
       .post('/')
       .set('Cookie', cookies(res))
       .set('xsrf-token', token)
       .expect(200, done)
-    });
-  });
+    })
+  })
 
-  it('should work in x-csrf-token header', function(done) {
+  it('should work in x-csrf-token header', function (done) {
     var server = createServer()
 
     request(server)
     .get('/')
     .expect(200, function (err, res) {
       if (err) return done(err)
-      var token = res.text;
+      var token = res.text
 
       request(server)
       .post('/')
       .set('Cookie', cookies(res))
       .set('x-csrf-token', token)
       .expect(200, done)
-    });
-  });
+    })
+  })
 
-  it('should work in x-xsrf-token header', function(done) {
+  it('should work in x-xsrf-token header', function (done) {
     var server = createServer()
 
     request(server)
     .get('/')
     .expect(200, function (err, res) {
       if (err) return done(err)
-      var token = res.text;
+      var token = res.text
 
       request(server)
       .post('/')
       .set('Cookie', cookies(res))
       .set('x-xsrf-token', token)
       .expect(200, done)
-    });
-  });
+    })
+  })
 
-  it('should work with a valid token (cookie-based, defaults)', function(done) {
+  it('should work with a valid token (cookie-based, defaults)', function (done) {
     var server = createServer({ cookie: true })
 
     request(server)
@@ -132,11 +132,11 @@ describe('csurf', function () {
       .set('Cookie', cookies(res))
       .set('X-CSRF-Token', token)
       .expect(200, done)
-    });
-  });
+    })
+  })
 
-  it('should work with a valid token (cookie-based, custom key)', function(done) {
-    var server = createServer({ cookie: { key: '_customcsrf' } });
+  it('should work with a valid token (cookie-based, custom key)', function (done) {
+    var server = createServer({ cookie: { key: '_customcsrf' } })
 
     request(server)
     .get('/')
@@ -153,27 +153,27 @@ describe('csurf', function () {
       .set('Cookie', cookies(res))
       .set('X-CSRF-Token', token)
       .expect(200, done)
-    });
-  });
+    })
+  })
 
-  it('should work with a valid token (cookie-based, signed)', function(done) {
+  it('should work with a valid token (cookie-based, signed)', function (done) {
     var server = createServer({ cookie: { signed: true } })
 
     request(server)
     .get('/')
     .expect(200, function (err, res) {
       if (err) return done(err)
-      var token = res.text;
+      var token = res.text
 
       request(server)
       .post('/')
       .set('Cookie', cookies(res))
       .set('X-CSRF-Token', token)
       .expect(200, done)
-    });
-  });
+    })
+  })
 
-  it('should fail with an invalid token', function(done) {
+  it('should fail with an invalid token', function (done) {
     var server = createServer()
 
     request(server)
@@ -185,10 +185,10 @@ describe('csurf', function () {
       .set('Cookie', cookies(res))
       .set('X-CSRF-Token', '42')
       .expect(403, done)
-    });
-  });
+    })
+  })
 
-  it('should fail with no token', function(done){
+  it('should fail with no token', function (done) {
     var server = createServer()
 
     request(server)
@@ -199,10 +199,10 @@ describe('csurf', function () {
       .post('/')
       .set('Cookie', cookies(res))
       .expect(403, done)
-    });
-  });
+    })
+  })
 
-  it('should provide error code on invalid token error', function(done){
+  it('should provide error code on invalid token error', function (done) {
     var app = connect()
     app.use(session({ keys: ['a', 'b'] }))
     app.use(csurf())
@@ -226,10 +226,10 @@ describe('csurf', function () {
       .set('Cookie', cookies(res))
       .set('X-CSRF-Token', String(res.text + 'p'))
       .expect(403, 'session has expired or form tampered with', done)
-    });
-  });
+    })
+  })
 
-  it('should error without secret storage', function(done) {
+  it('should error without secret storage', function (done) {
     var app = connect()
 
     app.use(csurf())
@@ -237,9 +237,9 @@ describe('csurf', function () {
     request(app)
     .get('/')
     .expect(500, /misconfigured csrf/, done)
-  });
+  })
 
-  it('should error without cookieParser secret and signed cookie storage', function(done) {
+  it('should error without cookieParser secret and signed cookie storage', function (done) {
     var app = connect()
 
     app.use(cookieParser())
@@ -248,7 +248,7 @@ describe('csurf', function () {
     request(app)
     .get('/')
     .expect(500, /cookieParser.*secret/, done)
-  });
+  })
 
   describe('with "ignoreMethods" option', function () {
     it('should reject invalid value', function () {
@@ -296,7 +296,7 @@ describe('csurf', function () {
       .get('/')
       .expect(200, function (err, res) {
         if (err) return done(err)
-        var token = res.text;
+        var token = res.text
 
         request(app)
         .post('/')
@@ -344,7 +344,7 @@ describe('csurf', function () {
       })
     })
 
-    it('should work with a valid token', function(done) {
+    it('should work with a valid token', function (done) {
       request(app)
       .get('/')
       .expect(200, function (err, res) {
@@ -358,7 +358,7 @@ describe('csurf', function () {
       })
     })
 
-    it('should provide a valid token when session regenerated', function(done) {
+    it('should provide a valid token when session regenerated', function (done) {
       request(app)
       .get('/new')
       .expect(200, function (err, res) {
@@ -372,27 +372,27 @@ describe('csurf', function () {
       })
     })
 
-    it('should error if session missing', function(done) {
+    it('should error if session missing', function (done) {
       request(app)
       .get('/break')
       .expect(500, /misconfigured csrf/, done)
     })
   })
-});
+})
 
-function cookie(res, name) {
+function cookie (res, name) {
   return res.headers['set-cookie'].filter(function (cookies) {
     return cookies.split('=')[0] === name
   })[0]
 }
 
-function cookies(res) {
+function cookies (res) {
   return res.headers['set-cookie'].map(function (cookies) {
     return cookies.split(';')[0]
   }).join(';')
 }
 
-function createServer(opts) {
+function createServer (opts) {
   var app = connect()
 
   if (!opts || (opts && !opts.cookie)) {
