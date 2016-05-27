@@ -13,7 +13,7 @@ unreleased
     - perf: hoist regular expression
     - perf: use for loop in parse
     - perf: use string concatination for serialization
-  * deps: csrf@~3.0.2
+  * deps: csrf@~3.0.3
     - Use `tsscmp` module for timing-safe token verification
     - deps: base64-url@1.2.2
     - deps: rndm@1.2.0
