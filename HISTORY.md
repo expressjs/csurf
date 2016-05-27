@@ -1,5 +1,5 @@
-unreleased
-==========
+1.9.0 / 2016-05-27
+==================
 
   * Pass invalid csrf token error to `next()` instead of throwing
   * Pass misconfigured error to `next()` instead of throwing
