@@ -17,7 +17,7 @@
   "devDependencies": {
     "body-parser": "1.15.1",
     "connect": "3.4.1",
-    "cookie-parser": "1.4.2",
+    "cookie-parser": "1.4.3",
     "cookie-session": "~1.1.0",
     "eslint": "2.10.2",
     "eslint-config-standard": "5.3.1",
