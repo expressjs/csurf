@@ -4,9 +4,10 @@ unreleased
   * Pass invalid csrf token error to `next()` instead of throwing
   * Pass misconfigured error to `next()` instead of throwing
   * Provide misconfigured error when using cookies without cookie-parser
-  * deps: cookie@0.2.4
-    - Add `firstPartyOnly` option
+  * deps: cookie@0.3.0
+    - Add `sameSite` option
     - Fix cookie `Max-Age` to never be a floating point number
+    - Improve error message when `expires` is not a `Date`
     - Throw better error for invalid argument to parse
     - Throw on invalid values provided to `serialize`
     - perf: enable strict mode
