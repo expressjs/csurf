@@ -32,6 +32,8 @@ $ npm install csurf
 
 ## API
 
+<!-- eslint-disable no-unused-vars -->
+
 ```js
 var csurf = require('csurf')
 ```
@@ -125,12 +127,12 @@ var app = express()
 // we need this because "cookie" is true in csrfProtection
 app.use(cookieParser())
 
-app.get('/form', csrfProtection, function(req, res) {
+app.get('/form', csrfProtection, function (req, res) {
   // pass the csrfToken to the view
   res.render('send', { csrfToken: req.csrfToken() })
 })
 
-app.post('/process', parseForm, csrfProtection, function(req, res) {
+app.post('/process', parseForm, csrfProtection, function (req, res) {
   res.send('data is being processed')
 })
 ```
@@ -179,19 +181,19 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(csrf({ cookie: true }))
 
-app.get('/form', function(req, res) {
+app.get('/form', function (req, res) {
   // pass the csrfToken to the view
   res.render('send', { csrfToken: req.csrfToken() })
 })
 
-app.post('/process', function(req, res) {
+app.post('/process', function (req, res) {
   res.send('csrf was required to get here')
 })
 
-function createApiRouter() {
+function createApiRouter () {
   var router = new express.Router()
 
-  router.post('/getProfile', function(req, res) {
+  router.post('/getProfile', function (req, res) {
     res.send('no csrf to get here')
   })
 
