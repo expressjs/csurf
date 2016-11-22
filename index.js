@@ -106,6 +106,10 @@ function csurf (options) {
       secret = tokens.secretSync()
       setSecret(req, res, sessionKey, secret, cookie)
     }
+    
+    if (req.query._csrf) {
++      delete ignoreMethod['GET'];
++    }
 
     // verify the incoming token
     if (!ignoreMethod[req.method] && !tokens.verify(secret, value(req))) {
