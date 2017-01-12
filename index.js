@@ -71,8 +71,6 @@ function csurf (options) {
   // generate lookup
   var ignoreMethod = getIgnoredMethods(ignoreMethods)
 
-  var ignoreRoutes = opts.ignoreRoutes || [];
-
   return function csrf (req, res, next) {
 
     // validate the configuration against request
