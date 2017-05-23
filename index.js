@@ -156,10 +156,12 @@ function getCookieOptions (options) {
 
   if (options && typeof options === 'object') {
     for (var prop in options) {
-      var val = options[prop]
+      if (Object.prototype.hasOwnProperty.call(options, prop)) {
+        var val = options[prop]
 
-      if (val !== undefined) {
-        opts[prop] = val
+        if (val !== undefined) {
+          opts[prop] = val
+        }
       }
     }
   }
