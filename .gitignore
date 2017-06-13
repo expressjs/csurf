@@ -1,8 +1,4 @@
-
-.DS_Store*
-*.log
-*.gz
-
-node_modules
-coverage
-cache
+node_modules/
+coverage/
+npm-debug.log
+package-lock.json
