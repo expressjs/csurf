@@ -4,9 +4,10 @@ unreleased
   * deps: csrf@~3.0.6
     - Remove `base64-url` dependency
     - deps: uid-safe@2.1.4
-  * deps: http-errors@~1.5.1
+  * deps: http-errors@~1.6.1
+    - Make `message` property enumerable for `HttpError`s
     - deps: inherits@2.0.3
-    - deps: setprototypeof@1.0.2
+    - deps: setprototypeof@1.0.3
     - deps: statuses@'>= 1.3.1 < 2'
 
 1.9.0 / 2016-05-27
