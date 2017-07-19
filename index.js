@@ -101,13 +101,17 @@ function csurf (options) {
       return token
     }
 
-    var submitted = value(req)
+    var submitted
+
+    if (!ignoreMethod[req.method]) {
+      submitted = value(req)
+    }
 
     // generate & set secret
     if (!secret) {
-      if (!ignoreMethod[req.method] && submitted) {
-        return next(createError(403, 'csrf token submitted but there is no active session', {
-          code: 'ECSRFNOSESSION'
+      if (submitted) {
+        return next(createError(403, 'no established csrf secret', {
+          code: 'ENOECSRFTOKEN'
         }))
       }
       secret = tokens.secretSync()

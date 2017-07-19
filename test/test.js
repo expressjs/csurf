@@ -202,6 +202,25 @@ describe('csurf', function () {
     })
   })
 
+  it('should fail with no token', function (done) {
+    var app = connect()
+    app.use(session({ keys: ['a', 'b'] }))
+
+    app.use(function (req, res, next) {
+      req.query = url.parse(req.url, true).query
+      next()
+    })
+    app.use(bodyParser.urlencoded({extended: false}))
+    app.use(csurf())
+
+    var server = http.createServer(app)
+
+    request(server)
+    .post('/')
+    .set('X-CSRF-Token', 'sadsadsadsfdsf')
+    .expect(403, /no established csrf secret/, done)
+  })
+
   it('should provide error code on invalid token error', function (done) {
     var app = connect()
     app.use(session({ keys: ['a', 'b'] }))
