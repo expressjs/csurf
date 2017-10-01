@@ -267,6 +267,8 @@ function setCookie (res, name, val, options) {
 function setSecret (req, res, sessionKey, val, cookie) {
   if (cookie) {
     // set secret on cookie
+    var value = val
+
     if (cookie.signed) {
       var secret = req.secret
 
@@ -275,10 +277,10 @@ function setSecret (req, res, sessionKey, val, cookie) {
         throw new Error('misconfigured csrf')
       }
 
-      val = 's:' + sign(val, secret)
+      value = 's:' + sign(val, secret)
     }
 
-    setCookie(res, cookie.key, val, cookie)
+    setCookie(res, cookie.key, value, cookie)
   } else if (req[sessionKey]) {
     // set secret on session
     req[sessionKey].csrfSecret = val

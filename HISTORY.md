@@ -10,6 +10,7 @@ unreleased
     - deps: inherits@2.0.3
     - deps: setprototypeof@1.0.3
     - deps: statuses@'>= 1.3.1 < 2'
+  * perf: remove argument reassignment
 
 1.9.0 / 2016-05-27
 ==================
