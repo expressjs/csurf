@@ -144,7 +144,7 @@ input field named `_csrf`:
 ```html
 <form action="/process" method="POST">
   <input type="hidden" name="_csrf" value="{{csrfToken}}">
-  
+
   Favorite color: <input type="text" name="favoriteColor">
   <button type="submit">Submit</button>
 </form>
@@ -248,7 +248,7 @@ be sent, most ajax libraries will have a way to enable this.
 #### Example
 ```js
 // Assumes the token was rendered into a meta tag
-var token = document.querySelector('meta[name="csurf"]').getAttribute('content');
+var token = document.querySelector('meta[name="csurf"]').getAttribute('content')
 
 // Make a request using the fetch api
 fetch('/protected', {
@@ -258,7 +258,7 @@ fetch('/protected', {
   },
   method: 'POST',
   body: {}
-});
+})
 ```
 
 ## License
