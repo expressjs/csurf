@@ -68,9 +68,10 @@ following keys:
 
   - `key` - the name of the cookie to use to store the token secret
     (defaults to `'_csrf'`).
-  - `path` - the path of the cookie (defaults to `'/'`).
   - any other [res.cookie](http://expressjs.com/4x/api.html#res.cookie)
-    option can be set.
+    option can be set. in particular, setting `signed: true` with your
+    server-generated secure secret hosted in `req.secret` can harden
+    the security
 
 ##### ignoreMethods
 
