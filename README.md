@@ -68,9 +68,10 @@ following keys:
 
   - `key` - the name of the cookie to use to store the token secret
     (defaults to `'_csrf'`).
-  - `path` - the path of the cookie (defaults to `'/'`).
-  - any other [res.cookie](http://expressjs.com/4x/api.html#res.cookie)
-    option can be set.
+  - any other [res.cookie](http://expressjs.com/en/4x/api.html#res.cookie)
+    option can be set. In particular, setting `signed` to `true` with a
+    secure secret configured using [cookie-parser][cookie-parser-config-url]
+    can harden the security.
 
 ##### ignoreMethods
 
@@ -242,3 +243,4 @@ app.use(function (err, req, res, next) {
 [downloads-url]: https://npmjs.org/package/csurf
 [gratipay-image]: https://img.shields.io/gratipay/dougwilson.svg
 [gratipay-url]: https://gratipay.com/dougwilson/
+[cookie-parser-config-url]: https://www.npmjs.com/package/cookie-parser#cookieparsersecret-options
