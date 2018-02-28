@@ -17,189 +17,189 @@ describe('csurf', function () {
     var server = createServer()
 
     request(server)
-    .get('/')
-    .expect(200, function (err, res) {
-      if (err) return done(err)
-      var token = res.text
+      .get('/')
+      .expect(200, function (err, res) {
+        if (err) return done(err)
+        var token = res.text
 
-      request(server)
-      .post('/')
-      .set('Cookie', cookies(res))
-      .send('_csrf=' + encodeURIComponent(token))
-      .expect(200, done)
-    })
+        request(server)
+          .post('/')
+          .set('Cookie', cookies(res))
+          .send('_csrf=' + encodeURIComponent(token))
+          .expect(200, done)
+      })
   })
 
   it('should work in req.query', function (done) {
     var server = createServer()
 
     request(server)
-    .get('/')
-    .expect(200, function (err, res) {
-      if (err) return done(err)
-      var token = res.text
+      .get('/')
+      .expect(200, function (err, res) {
+        if (err) return done(err)
+        var token = res.text
 
-      request(server)
-      .post('/?_csrf=' + encodeURIComponent(token))
-      .set('Cookie', cookies(res))
-      .expect(200, done)
-    })
+        request(server)
+          .post('/?_csrf=' + encodeURIComponent(token))
+          .set('Cookie', cookies(res))
+          .expect(200, done)
+      })
   })
 
   it('should work in csrf-token header', function (done) {
     var server = createServer()
 
     request(server)
-    .get('/')
-    .expect(200, function (err, res) {
-      if (err) return done(err)
-      var token = res.text
+      .get('/')
+      .expect(200, function (err, res) {
+        if (err) return done(err)
+        var token = res.text
 
-      request(server)
-      .post('/')
-      .set('Cookie', cookies(res))
-      .set('csrf-token', token)
-      .expect(200, done)
-    })
+        request(server)
+          .post('/')
+          .set('Cookie', cookies(res))
+          .set('csrf-token', token)
+          .expect(200, done)
+      })
   })
 
   it('should work in xsrf-token header', function (done) {
     var server = createServer()
 
     request(server)
-    .get('/')
-    .expect(200, function (err, res) {
-      if (err) return done(err)
-      var token = res.text
+      .get('/')
+      .expect(200, function (err, res) {
+        if (err) return done(err)
+        var token = res.text
 
-      request(server)
-      .post('/')
-      .set('Cookie', cookies(res))
-      .set('xsrf-token', token)
-      .expect(200, done)
-    })
+        request(server)
+          .post('/')
+          .set('Cookie', cookies(res))
+          .set('xsrf-token', token)
+          .expect(200, done)
+      })
   })
 
   it('should work in x-csrf-token header', function (done) {
     var server = createServer()
 
     request(server)
-    .get('/')
-    .expect(200, function (err, res) {
-      if (err) return done(err)
-      var token = res.text
+      .get('/')
+      .expect(200, function (err, res) {
+        if (err) return done(err)
+        var token = res.text
 
-      request(server)
-      .post('/')
-      .set('Cookie', cookies(res))
-      .set('x-csrf-token', token)
-      .expect(200, done)
-    })
+        request(server)
+          .post('/')
+          .set('Cookie', cookies(res))
+          .set('x-csrf-token', token)
+          .expect(200, done)
+      })
   })
 
   it('should work in x-xsrf-token header', function (done) {
     var server = createServer()
 
     request(server)
-    .get('/')
-    .expect(200, function (err, res) {
-      if (err) return done(err)
-      var token = res.text
+      .get('/')
+      .expect(200, function (err, res) {
+        if (err) return done(err)
+        var token = res.text
 
-      request(server)
-      .post('/')
-      .set('Cookie', cookies(res))
-      .set('x-xsrf-token', token)
-      .expect(200, done)
-    })
+        request(server)
+          .post('/')
+          .set('Cookie', cookies(res))
+          .set('x-xsrf-token', token)
+          .expect(200, done)
+      })
   })
 
   it('should work with a valid token (cookie-based, defaults)', function (done) {
     var server = createServer({ cookie: true })
 
     request(server)
-    .get('/')
-    .expect(200, function (err, res) {
-      if (err) return done(err)
-      var data = cookie(res, '_csrf')
-      var token = res.text
+      .get('/')
+      .expect(200, function (err, res) {
+        if (err) return done(err)
+        var data = cookie(res, '_csrf')
+        var token = res.text
 
-      assert.ok(Boolean(data))
-      assert.ok(/; *path=\/(?:;|$)/i.test(data))
+        assert.ok(Boolean(data))
+        assert.ok(/; *path=\/(?:;|$)/i.test(data))
 
-      request(server)
-      .post('/')
-      .set('Cookie', cookies(res))
-      .set('X-CSRF-Token', token)
-      .expect(200, done)
-    })
+        request(server)
+          .post('/')
+          .set('Cookie', cookies(res))
+          .set('X-CSRF-Token', token)
+          .expect(200, done)
+      })
   })
 
   it('should work with a valid token (cookie-based, custom key)', function (done) {
     var server = createServer({ cookie: { key: '_customcsrf' } })
 
     request(server)
-    .get('/')
-    .expect(200, function (err, res) {
-      if (err) return done(err)
-      var data = cookie(res, '_customcsrf')
-      var token = res.text
+      .get('/')
+      .expect(200, function (err, res) {
+        if (err) return done(err)
+        var data = cookie(res, '_customcsrf')
+        var token = res.text
 
-      assert.ok(Boolean(data))
-      assert.ok(/; *path=\/(?:;|$)/i.test(data))
+        assert.ok(Boolean(data))
+        assert.ok(/; *path=\/(?:;|$)/i.test(data))
 
-      request(server)
-      .post('/')
-      .set('Cookie', cookies(res))
-      .set('X-CSRF-Token', token)
-      .expect(200, done)
-    })
+        request(server)
+          .post('/')
+          .set('Cookie', cookies(res))
+          .set('X-CSRF-Token', token)
+          .expect(200, done)
+      })
   })
 
   it('should work with a valid token (cookie-based, signed)', function (done) {
     var server = createServer({ cookie: { signed: true } })
 
     request(server)
-    .get('/')
-    .expect(200, function (err, res) {
-      if (err) return done(err)
-      var token = res.text
+      .get('/')
+      .expect(200, function (err, res) {
+        if (err) return done(err)
+        var token = res.text
 
-      request(server)
-      .post('/')
-      .set('Cookie', cookies(res))
-      .set('X-CSRF-Token', token)
-      .expect(200, done)
-    })
+        request(server)
+          .post('/')
+          .set('Cookie', cookies(res))
+          .set('X-CSRF-Token', token)
+          .expect(200, done)
+      })
   })
 
   it('should fail with an invalid token', function (done) {
     var server = createServer()
 
     request(server)
-    .get('/')
-    .expect(200, function (err, res) {
-      if (err) return done(err)
-      request(server)
-      .post('/')
-      .set('Cookie', cookies(res))
-      .set('X-CSRF-Token', '42')
-      .expect(403, done)
-    })
+      .get('/')
+      .expect(200, function (err, res) {
+        if (err) return done(err)
+        request(server)
+          .post('/')
+          .set('Cookie', cookies(res))
+          .set('X-CSRF-Token', '42')
+          .expect(403, done)
+      })
   })
 
   it('should fail with no token', function (done) {
     var server = createServer()
 
     request(server)
-    .get('/')
-    .expect(200, function (err, res) {
-      if (err) return done(err)
-      request(server)
-      .post('/')
-      .set('Cookie', cookies(res))
-      .expect(403, done)
-    })
+      .get('/')
+      .expect(200, function (err, res) {
+        if (err) return done(err)
+        request(server)
+          .post('/')
+          .set('Cookie', cookies(res))
+          .expect(403, done)
+      })
   })
 
   it('should provide error code on invalid token error', function (done) {
@@ -218,15 +218,15 @@ describe('csurf', function () {
     })
 
     request(app)
-    .get('/')
-    .expect(200, function (err, res) {
-      if (err) return done(err)
-      request(app)
-      .post('/')
-      .set('Cookie', cookies(res))
-      .set('X-CSRF-Token', String(res.text + 'p'))
-      .expect(403, 'session has expired or form tampered with', done)
-    })
+      .get('/')
+      .expect(200, function (err, res) {
+        if (err) return done(err)
+        request(app)
+          .post('/')
+          .set('Cookie', cookies(res))
+          .set('X-CSRF-Token', String(res.text + 'p'))
+          .expect(403, 'session has expired or form tampered with', done)
+      })
   })
 
   it('should error without session secret storage', function (done) {
@@ -235,8 +235,8 @@ describe('csurf', function () {
     app.use(csurf())
 
     request(app)
-    .get('/')
-    .expect(500, /misconfigured csrf/, done)
+      .get('/')
+      .expect(500, /misconfigured csrf/, done)
   })
 
   it('should error without cookie secret storage', function (done) {
@@ -245,8 +245,8 @@ describe('csurf', function () {
     app.use(csurf({ cookie: true }))
 
     request(app)
-    .get('/')
-    .expect(500, /misconfigured csrf/, done)
+      .get('/')
+      .expect(500, /misconfigured csrf/, done)
   })
 
   it('should error without cookieParser secret and signed cookie storage', function (done) {
@@ -256,8 +256,8 @@ describe('csurf', function () {
     app.use(csurf({ cookie: { signed: true } }))
 
     request(app)
-    .get('/')
-    .expect(500, /misconfigured csrf/, done)
+      .get('/')
+      .expect(500, /misconfigured csrf/, done)
   })
 
   describe('with "ignoreMethods" option', function () {
@@ -269,21 +269,21 @@ describe('csurf', function () {
       var server = createServer({ignoreMethods: ['GET', 'POST']})
 
       request(server)
-      .get('/')
-      .expect(200, function (err, res) {
-        if (err) return done(err)
-        var cookie = cookies(res)
-        request(server)
-        .post('/')
-        .set('Cookie', cookie)
+        .get('/')
         .expect(200, function (err, res) {
           if (err) return done(err)
+          var cookie = cookies(res)
           request(server)
-          .put('/')
-          .set('Cookie', cookie)
-          .expect(403, done)
+            .post('/')
+            .set('Cookie', cookie)
+            .expect(200, function (err, res) {
+              if (err) return done(err)
+              request(server)
+                .put('/')
+                .set('Cookie', cookie)
+                .expect(403, done)
+            })
         })
-      })
     })
   })
 
@@ -303,16 +303,16 @@ describe('csurf', function () {
       })
 
       request(app)
-      .get('/')
-      .expect(200, function (err, res) {
-        if (err) return done(err)
-        var token = res.text
+        .get('/')
+        .expect(200, function (err, res) {
+          if (err) return done(err)
+          var token = res.text
 
-        request(app)
-        .post('/')
-        .send('_csrf=' + encodeURIComponent(token))
-        .expect(200, done)
-      })
+          request(app)
+            .post('/')
+            .send('_csrf=' + encodeURIComponent(token))
+            .expect(200, done)
+        })
     })
   })
 
@@ -328,8 +328,8 @@ describe('csurf', function () {
       })
 
       request(app)
-      .get('/')
-      .expect(200, 'true', done)
+        .get('/')
+        .expect(200, 'true', done)
     })
   })
 
@@ -356,36 +356,36 @@ describe('csurf', function () {
 
     it('should work with a valid token', function (done) {
       request(app)
-      .get('/')
-      .expect(200, function (err, res) {
-        if (err) return done(err)
-        var token = res.text
-        request(app)
-        .post('/')
-        .set('Cookie', cookies(res))
-        .set('X-CSRF-Token', token)
-        .expect(200, done)
-      })
+        .get('/')
+        .expect(200, function (err, res) {
+          if (err) return done(err)
+          var token = res.text
+          request(app)
+            .post('/')
+            .set('Cookie', cookies(res))
+            .set('X-CSRF-Token', token)
+            .expect(200, done)
+        })
     })
 
     it('should provide a valid token when session regenerated', function (done) {
       request(app)
-      .get('/new')
-      .expect(200, function (err, res) {
-        if (err) return done(err)
-        var token = res.text
-        request(app)
-        .post('/')
-        .set('Cookie', cookies(res))
-        .set('X-CSRF-Token', token)
-        .expect(200, done)
-      })
+        .get('/new')
+        .expect(200, function (err, res) {
+          if (err) return done(err)
+          var token = res.text
+          request(app)
+            .post('/')
+            .set('Cookie', cookies(res))
+            .set('X-CSRF-Token', token)
+            .expect(200, done)
+        })
     })
 
     it('should error if session missing', function (done) {
       request(app)
-      .get('/break')
-      .expect(500, /misconfigured csrf/, done)
+        .get('/break')
+        .expect(500, /misconfigured csrf/, done)
     })
   })
 })
