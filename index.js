@@ -58,14 +58,21 @@ function csurf (options) {
     ? ['GET', 'HEAD', 'OPTIONS']
     : opts.ignoreMethods
 
+  var ignoreRoutes = opts.ignoreRoutes || [];
+
   if (!Array.isArray(ignoreMethods)) {
     throw new TypeError('option ignoreMethods must be an array')
+  }
+
+  if (!Array.isArray(ignoreRoutes)) {
+    throw new TypeError('option ignoreRoutes must be an array')
   }
 
   // generate lookup
   var ignoreMethod = getIgnoredMethods(ignoreMethods)
 
   return function csrf (req, res, next) {
+
     // validate the configuration against request
     if (!verifyConfiguration(req, sessionKey, cookie)) {
       return next(new Error('misconfigured csrf'))
@@ -107,6 +114,11 @@ function csurf (options) {
       setSecret(req, res, sessionKey, secret, cookie)
     }
 
+    // if url is on ignore list, do not verify incoming token, keep going
+    if(ignoreRoutes.length && areRoutesNotInURL(ignoreRoutes, req.originalUrl)) {
+       return next();
+    }
+
     // verify the incoming token
     if (!ignoreMethod[req.method] && !tokens.verify(secret, value(req))) {
       return next(createError(403, 'invalid csrf token', {
@@ -116,6 +128,20 @@ function csurf (options) {
 
     next()
   }
+}
+
+/**
+ * Check if none of the given routes
+ * are in the given URL
+ * 
+ * @param {Array} routes
+ * @param {String} url
+ * @return {Boolean}
+ * @api private
+ */
+
+function areRoutesNotInURL(routes, url) {
+  return !(new RegExp('^\/(?!('+routes.join('|')+')).*').test(url));
 }
 
 /**
