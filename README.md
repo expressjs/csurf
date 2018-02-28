@@ -143,7 +143,7 @@ input field named `_csrf`:
 ```html
 <form action="/process" method="POST">
   <input type="hidden" name="_csrf" value="{{csrfToken}}">
-  
+
   Favorite color: <input type="text" name="favoriteColor">
   <button type="submit">Submit</button>
 </form>
@@ -224,6 +224,39 @@ app.use(function (err, req, res, next) {
   // handle CSRF token errors here
   res.status(403)
   res.send('form tampered with')
+})
+```
+
+### Using AJAX
+
+When accessing protected routes via ajax both the csrf token and the token secret
+will need to be passed in the request.
+
+#### CSRF Token
+The CSRF token is obtained from `req.csrfToken()`, one possibility is to store
+it in a meta tag, the value can then be retrieved at the time of the request.
+
+When making the ajax call the token will need to be passed in one of the headers
+listed in the [API Options](#value).
+
+#### Token Secret
+Additionally the token secret will need to be sent, this is stored either in a
+cookie or `req.session`, to include this data the user credentials will need to
+be sent, most ajax libraries will have a way to enable this.
+
+#### Example
+```js
+// Assumes the token was rendered into a meta tag
+var token = document.querySelector('meta[name="csurf"]').getAttribute('content')
+
+// Make a request using the fetch api
+fetch('/protected', {
+  credentials: 'same-origin',
+  headers: {
+    'csrf-token': token
+  },
+  method: 'POST',
+  body: {}
 })
 ```
 
