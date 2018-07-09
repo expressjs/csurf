@@ -265,6 +265,7 @@ function setCookie (res, name, val, options) {
  */
 
 function setSecret (req, res, sessionKey, val, cookie) {
+  req.csrfCookie = val
   if (cookie) {
     // set secret on cookie
     var value = val
