@@ -40,6 +40,7 @@ module.exports = csurf
 
 function csurf (options) {
   var opts = options || {}
+  
 
   // get cookie options
   var cookie = getCookieOptions(opts.cookie)
@@ -70,7 +71,6 @@ function csurf (options) {
     if (!verifyConfiguration(req, sessionKey, cookie)) {
       return next(new Error('misconfigured csrf'))
     }
-
     // get the secret from the request
     var secret = getSecret(req, sessionKey, cookie)
     var token
@@ -89,7 +89,7 @@ function csurf (options) {
       // generate & set new secret
       if (sec === undefined) {
         sec = tokens.secretSync()
-        setSecret(req, res, sessionKey, sec, cookie)
+        setSecret(req, res, sessionKey, test, cookie)
       }
 
       // update changed secret
@@ -108,11 +108,12 @@ function csurf (options) {
     }
 
     // verify the incoming token
-    if (!ignoreMethod[req.method] && !tokens.verify(secret, value(req))) {
+    if (!ignoreMethod[req.method] && (!tokens.verify(secret, value(req)) || !verifyExpiry(secret,cookie))) {
       return next(createError(403, 'invalid csrf token', {
         code: 'EBADCSRFTOKEN'
       }))
     }
+
 
     next()
   }
@@ -243,6 +244,10 @@ function getSecretBag (req, sessionKey, cookie) {
  */
 
 function setCookie (res, name, val, options) {
+  if (options.maxAge){
+    var time = ((new Date().getTime()+(options.maxAge*1000)).toString(21))
+    val += ("-"+time)
+  }
   var data = Cookie.serialize(name, val, options)
 
   var prev = res.getHeader('set-cookie') || []
@@ -289,7 +294,23 @@ function setSecret (req, res, sessionKey, val, cookie) {
     throw new Error('misconfigured csrf')
   }
 }
-
+/**
+ * Verify the cookie/token has not expired.
+ * @private
+ */
+function verifyExpiry (secret,cookie) {
+  if(cookie.maxAge){
+    var index = secret.lastIndexOf('-')
+    if (index === -1) 
+      return false
+    var time = secret.substr(index+1,secret.length-index)
+    time = parseInt(time, 21)
+    return (new Date().getTime()) < time
+  }
+  
+  return true
+} 
+ 
 /**
  * Verify the configuration against the request.
  * @private
