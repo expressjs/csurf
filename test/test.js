@@ -1,4 +1,3 @@
-
 process.env.NODE_ENV = 'test'
 
 var assert = require('assert')
@@ -262,11 +261,11 @@ describe('csurf', function () {
 
   describe('with "ignoreMethods" option', function () {
     it('should reject invalid value', function () {
-      assert.throws(createServer.bind(null, {ignoreMethods: 'tj'}), /option ignoreMethods/)
+      assert.throws(createServer.bind(null, { ignoreMethods: 'tj' }), /option ignoreMethods/)
     })
 
     it('should not check token on given methods', function (done) {
-      var server = createServer({ignoreMethods: ['GET', 'POST']})
+      var server = createServer({ ignoreMethods: ['GET', 'POST'] })
 
       request(server)
         .get('/')
@@ -346,7 +345,7 @@ describe('csurf', function () {
       })
       app.use('/new', function (req, res, next) {
         // regenerate session
-        req.session = {hit: 1}
+        req.session = { hit: 1 }
         next()
       })
       app.use(function (req, res) {
@@ -388,6 +387,36 @@ describe('csurf', function () {
         .expect(500, /misconfigured csrf/, done)
     })
   })
+  describe('when using "maxAge" cookie option', function () {
+    var server = createServer({ cookie: { maxAge: 3600 } })
+    it('should work in with valid token', function (done) {
+      request(server)
+        .get('/')
+        .expect(200, function (err, res) {
+          if (err) return done(err)
+          var token = res.text
+          request(server)
+            .post('/')
+            .set('Cookie', cookies(res))
+            .set('csrf-token', token)
+            .expect(200, done)
+        })
+    })
+    it('should reject expired tokens', function (done) {
+      var server = createServer({ cookie: { maxAge: -3600 } })
+      request(server)
+        .get('/')
+        .expect(200, function (err, res) {
+          if (err) return done(err)
+          var token = res.text
+          request(server)
+            .post('/')
+            .set('Cookie', cookies(res))
+            .set('csrf-token', token)
+            .expect(403, done)
+        })
+    })
+  })
 })
 
 function cookie (res, name) {
@@ -415,7 +444,7 @@ function createServer (opts) {
     req.query = url.parse(req.url, true).query
     next()
   })
-  app.use(bodyParser.urlencoded({extended: false}))
+  app.use(bodyParser.urlencoded({ extended: false }))
   app.use(csurf(opts))
 
   app.use(function (req, res) {
