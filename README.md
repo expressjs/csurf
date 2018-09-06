@@ -68,6 +68,7 @@ following keys:
   - `key` - the name of the cookie to use to store the token secret
     (defaults to `'_csrf'`).
   - `path` - the path of the cookie (defaults to `'/'`).
+  - `maxAge` - the maximum age the cookie can be before it expires in seconds. Setting this parameter will cause a 403 response if any cookie and csfr token is sent beyond the maxAge window.
   - any other [res.cookie](http://expressjs.com/4x/api.html#res.cookie)
     option can be set.
 
@@ -116,7 +117,7 @@ var bodyParser = require('body-parser')
 var express = require('express')
 
 // setup route middlewares
-var csrfProtection = csrf({ cookie: true })
+var csrfProtection = csrf({ cookie: { maxAge: 60 * 60 * 8 } })
 var parseForm = bodyParser.urlencoded({ extended: false })
 
 // create express app
@@ -220,7 +221,7 @@ app.use('/api', api)
 // now add csrf and other middlewares, after the "/api" was mounted
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
-app.use(csrf({ cookie: true }))
+app.use(csrf({ cookie: { maxAge: 60 * 60 * 8 } }))
 
 app.get('/form', function (req, res) {
   // pass the csrfToken to the view
