@@ -262,11 +262,11 @@ describe('csurf', function () {
 
   describe('with "ignoreMethods" option', function () {
     it('should reject invalid value', function () {
-      assert.throws(createServer.bind(null, {ignoreMethods: 'tj'}), /option ignoreMethods/)
+      assert.throws(createServer.bind(null, { ignoreMethods: 'tj' }), /option ignoreMethods/)
     })
 
     it('should not check token on given methods', function (done) {
-      var server = createServer({ignoreMethods: ['GET', 'POST']})
+      var server = createServer({ ignoreMethods: ['GET', 'POST'] })
 
       request(server)
         .get('/')
@@ -346,7 +346,7 @@ describe('csurf', function () {
       })
       app.use('/new', function (req, res, next) {
         // regenerate session
-        req.session = {hit: 1}
+        req.session = { hit: 1 }
         next()
       })
       app.use(function (req, res) {
@@ -415,7 +415,7 @@ function createServer (opts) {
     req.query = url.parse(req.url, true).query
     next()
   })
-  app.use(bodyParser.urlencoded({extended: false}))
+  app.use(bodyParser.urlencoded({ extended: false }))
   app.use(csurf(opts))
 
   app.use(function (req, res) {
