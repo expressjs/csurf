@@ -199,6 +199,28 @@ fetch('/process', {
 })
 ```
 
+#### Single Page Application (SPA)
+
+Many SPA frameworks like Angular have CSRF support built in automatically.
+Typically they will reflect the value from a specific cookie, like
+`XSRF-TOKEN` (which is the case for Angular).
+
+To take advantage of this, set the value from `req.csrfToken()` in the cookie
+used by the SPA framework. This is only necessary to do on the route that
+renders the page (where `res.render` or `res.sendFile` is called in Express,
+for example).
+
+The following is an example for Express of a typical SPA response:
+
+<!-- eslint-disable no-undef -->
+
+```js
+app.all('*', function (req, res) {
+  res.cookie('XSRF-TOKEN', req.csrfToken())
+  res.render('index')
+})
+```
+
 ### Ignoring Routes
 
 **Note** CSRF checks should only be disabled for requests that you expect to
