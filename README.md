@@ -68,8 +68,16 @@ following keys:
   - `key` - the name of the cookie to use to store the token secret
     (defaults to `'_csrf'`).
   - `path` - the path of the cookie (defaults to `'/'`).
-  - any other [res.cookie](http://expressjs.com/4x/api.html#res.cookie)
-    option can be set.
+  - `signed` - indicates if the cookie should be signed (defaults to `false`).
+  - `secure` - marks the cookie to be used with HTTPS only (defaults to
+    `false`).
+  - `maxAge` - the number of seconds after which the cookie will expire
+    (defaults to session length).
+  - `httpOnly` - flags the cookie to be accessible only by the web server
+    (defaults to `false`).
+  - `sameSite` - sets the same site policy for the cookie (defaults to none).
+  - `domain` - sets the domain the cookie is valid on (defaults to current
+    domain).
 
 ##### ignoreMethods
 
