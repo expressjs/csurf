@@ -58,12 +58,12 @@ function csurf (options) {
     ? ['GET', 'HEAD', 'OPTIONS']
     : opts.ignoreMethods
 
-  if (!Array.isArray(ignoreMethods)) {
+  if (!Array.isArray(ignoreMethods) && typeof ignoreMethods !== "function") {
     throw new TypeError('option ignoreMethods must be an array')
   }
 
   // generate lookup
-  var ignoreMethod = getIgnoredMethods(ignoreMethods)
+  var ignoreMethod = typeof ignoreMethods === "function" ? ignoreMethods : getIgnoredMethods(ignoreMethods)
 
   return function csrf (req, res, next) {
     // validate the configuration against request
@@ -108,7 +108,7 @@ function csurf (options) {
     }
 
     // verify the incoming token
-    if (!ignoreMethod[req.method] && !tokens.verify(secret, value(req))) {
+    if (!ignoreMethod(req) && !tokens.verify(secret, value(req))) {
       return next(createError(403, 'invalid csrf token', {
         code: 'EBADCSRFTOKEN'
       }))
@@ -171,7 +171,7 @@ function getCookieOptions (options) {
  * Get a lookup of ignored methods.
  *
  * @param {array} methods
- * @returns {object}
+ * @returns {Function}
  * @api private
  */
 
@@ -183,7 +183,9 @@ function getIgnoredMethods (methods) {
     obj[method] = true
   }
 
-  return obj
+  return function (req) {
+    return obj[req.method]
+  }
 }
 
 /**
