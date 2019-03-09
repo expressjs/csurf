@@ -12,7 +12,7 @@
     "cookie": "0.3.1",
     "cookie-signature": "1.0.6",
     "csrf": "~3.0.6",
-    "http-errors": "~1.6.3"
+    "http-errors": "~1.7.2"
   },
   "devDependencies": {
     "body-parser": "1.18.3",
