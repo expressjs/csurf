@@ -28,7 +28,7 @@
     "eslint-plugin-standard": "4.0.0",
     "istanbul": "0.4.5",
     "mocha": "2.5.3",
-    "supertest": "1.1.0"
+    "supertest": "3.4.2"
   },
   "engines": {
     "node": ">= 0.8.0"

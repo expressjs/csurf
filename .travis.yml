@@ -38,6 +38,14 @@ before_install:
         fs.writeFileSync("package.json", JSON.stringify(p, null, 2) + "\n");
       ' "$@"
     }
+    function npm_use_module () {
+      node -e '
+        fs = require("fs");
+        p = JSON.parse(fs.readFileSync("package.json", "utf8"));
+        p.devDependencies[process.argv[1]] = process.argv[2];
+        fs.writeFileSync("package.json", JSON.stringify(p, null, 2) + "\n");
+      ' "$@"
+    }
     function v () {
       tr '.' '\n' <<< "${1}" \
         | awk '{ printf "%03d", $0 }' \
@@ -51,6 +59,11 @@ before_install:
   - |
     # Configure istanbul for coverage
     if node_version_lt '0.10'; then npm_remove_module_re '^istanbul$'
+    fi
+  - |
+    # Configure supertest for http calls
+    if   node_version_lt '0.10'; then npm_use_module 'supertest' '1.1.0'
+    elif node_version_lt '4.0' ; then npm_use_module 'supertest' '2.0.0'
     fi
   - |
     # Configure eslint for linting
