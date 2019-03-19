@@ -226,6 +226,27 @@ describe('csurf', function () {
           })
       })
 
+      it('should keep default cookie name when "key: undefined"', function (done) {
+        var server = createServer({ cookie: { key: undefined } })
+
+        request(server)
+          .get('/')
+          .expect(200, function (err, res) {
+            if (err) return done(err)
+            var data = cookie(res, '_csrf')
+            var token = res.text
+
+            assert.ok(Boolean(data))
+            assert.ok(/; *path=\/(?:;|$)/i.test(data))
+
+            request(server)
+              .post('/')
+              .set('Cookie', cookies(res))
+              .set('X-CSRF-Token', token)
+              .expect(200, done)
+          })
+      })
+
       describe('when "signed": true', function () {
         it('should enable signing', function (done) {
           var server = createServer({ cookie: { signed: true } })
