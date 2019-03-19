@@ -202,7 +202,6 @@ function getSecret (req, sessionKey, cookie) {
   var key = cookie ? cookie.key : 'csrfSecret'
 
   if (!bag) {
-    /* istanbul ignore next: should never actually run */
     throw new Error('misconfigured csrf')
   }
 

@@ -364,6 +364,23 @@ describe('csurf', function () {
         .get('/')
         .expect(200, 'true', done)
     })
+
+    it('should error when secret storage missing', function (done) {
+      var app = connect()
+
+      app.use(session({ keys: ['a', 'b'] }))
+      app.use(csurf())
+      app.use(function (req, res) {
+        req.session = null
+        res.setHeader('x-run', 'true')
+        res.end(req.csrfToken())
+      })
+
+      request(app)
+        .get('/')
+        .expect('x-run', 'true')
+        .expect(500, /misconfigured csrf/, done)
+    })
   })
 
   describe('when using session storage', function () {
