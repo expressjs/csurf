@@ -149,10 +149,11 @@ function getCookieOptions (options) {
     return undefined
   }
 
-  var opts = {
-    key: '_csrf',
-    path: '/'
-  }
+  var opts = Object.create(null)
+
+  // defaults
+  opts.key = '_csrf'
+  opts.path = '/'
 
   if (options && typeof options === 'object') {
     for (var prop in options) {

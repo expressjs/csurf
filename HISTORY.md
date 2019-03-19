@@ -12,6 +12,7 @@ unreleased
     - deps: setprototypeof@1.1.1
     - deps: statuses@'>= 1.5.0 < 2'
   * perf: remove argument reassignment
+  * perf: use plain object for internal cookie options
 
 1.9.0 / 2016-05-27
 ==================
