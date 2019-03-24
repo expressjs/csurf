@@ -202,6 +202,36 @@ describe('csurf', function () {
               .expect(200, done)
           })
       })
+
+      it('should append cookie to existing Set-Cookie header', function (done) {
+        var app = connect()
+
+        app.use(cookieParser('keyboard cat'))
+        app.use(function (req, res, next) {
+          res.setHeader('Set-Cookie', 'foo=bar')
+          next()
+        })
+        app.use(csurf({ cookie: true }))
+        app.use(function (req, res) {
+          res.end(req.csrfToken() || 'none')
+        })
+
+        request(app)
+          .get('/')
+          .expect(200, function (err, res) {
+            if (err) return done(err)
+            var token = res.text
+
+            assert.ok(Boolean(cookie(res, '_csrf')))
+            assert.ok(Boolean(cookie(res, 'foo')))
+
+            request(app)
+              .post('/')
+              .set('Cookie', cookies(res))
+              .set('X-CSRF-Token', token)
+              .expect(200, done)
+          })
+      })
     })
 
     describe('when an object', function () {
