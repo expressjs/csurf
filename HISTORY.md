@@ -1,9 +1,10 @@
 unreleased
 ==========
 
-  * deps: csrf@~3.0.6
+  * deps: csrf@3.1.0
     - Remove `base64-url` dependency
-    - deps: uid-safe@2.1.4
+    - deps: tsscmp@1.0.6
+    - deps: uid-safe@2.1.5
   * deps: http-errors@~1.7.2
     - Make `message` property enumerable for `HttpError`s
     - Set constructor name when possible
