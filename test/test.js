@@ -7,8 +7,8 @@ var http = require('http')
 var session = require('cookie-session')
 var bodyParser = require('body-parser')
 var cookieParser = require('cookie-parser')
+var querystring = require('querystring')
 var request = require('supertest')
-var url = require('url')
 
 var csurf = require('..')
 
@@ -492,7 +492,12 @@ function createServer (opts) {
   }
 
   app.use(function (req, res, next) {
-    req.query = url.parse(req.url, true).query
+    var index = req.url.indexOf('?') + 1
+
+    if (index) {
+      req.query = querystring.parse(req.url.substring(index))
+    }
+
     next()
   })
   app.use(bodyParser.urlencoded({ extended: false }))
