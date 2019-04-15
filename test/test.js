@@ -1,4 +1,3 @@
-
 process.env.NODE_ENV = 'test'
 
 var assert = require('assert')
@@ -466,6 +465,36 @@ describe('csurf', function () {
       request(app)
         .get('/break')
         .expect(500, /misconfigured csrf/, done)
+    })
+  })
+  describe('when using "maxAge" cookie option', function () {
+    var server = createServer({ cookie: { maxAge: 3600 } })
+    it('should work in with valid token', function (done) {
+      request(server)
+        .get('/')
+        .expect(200, function (err, res) {
+          if (err) return done(err)
+          var token = res.text
+          request(server)
+            .post('/')
+            .set('Cookie', cookies(res))
+            .set('csrf-token', token)
+            .expect(200, done)
+        })
+    })
+    it('should reject expired tokens', function (done) {
+      var server = createServer({ cookie: { maxAge: -3600 } })
+      request(server)
+        .get('/')
+        .expect(200, function (err, res) {
+          if (err) return done(err)
+          var token = res.text
+          request(server)
+            .post('/')
+            .set('Cookie', cookies(res))
+            .set('csrf-token', token)
+            .expect(403, done)
+        })
     })
   })
 })

@@ -89,6 +89,7 @@ function csurf (options) {
       // generate & set new secret
       if (sec === undefined) {
         sec = tokens.secretSync()
+        sec = setExpiry(sec, cookie)
         setSecret(req, res, sessionKey, sec, cookie)
       }
 
@@ -104,11 +105,12 @@ function csurf (options) {
     // generate & set secret
     if (!secret) {
       secret = tokens.secretSync()
+      secret = setExpiry(secret, cookie)
       setSecret(req, res, sessionKey, secret, cookie)
     }
 
     // verify the incoming token
-    if (!ignoreMethod[req.method] && !tokens.verify(secret, value(req))) {
+    if (!ignoreMethod[req.method] && (!tokens.verify(secret, value(req)) || !verifyExpiry(secret, cookie))) {
       return next(createError(403, 'invalid csrf token', {
         code: 'EBADCSRFTOKEN'
       }))
@@ -233,6 +235,25 @@ function getSecretBag (req, sessionKey, cookie) {
 }
 
 /**
+ * Set an expiry time on the cookie.
+ *
+ * @param {string} val
+ * @param {Object} [options]
+ * @api private
+ */
+
+function setExpiry (val, options) {
+  var secret = val
+  if (options) {
+    if (options.maxAge) {
+      var time = ((new Date().getTime() + (options.maxAge * 1000)).toString(21))
+      secret += ('-' + time)
+    }
+  }
+  return secret
+}
+
+/**
  * Set a cookie on the HTTP response.
  *
  * @param {OutgoingMessage} res
@@ -244,7 +265,6 @@ function getSecretBag (req, sessionKey, cookie) {
 
 function setCookie (res, name, val, options) {
   var data = Cookie.serialize(name, val, options)
-
   var prev = res.getHeader('set-cookie') || []
   var header = Array.isArray(prev) ? prev.concat(data)
     : [prev, data]
@@ -287,6 +307,22 @@ function setSecret (req, res, sessionKey, val, cookie) {
     /* istanbul ignore next: should never actually run */
     throw new Error('misconfigured csrf')
   }
+}
+/**
+ * Verify the cookie/token has not expired.
+ * @private
+ */
+function verifyExpiry (secret, cookie) {
+  if (cookie) {
+    if (cookie.maxAge) {
+      var index = secret.lastIndexOf('-')
+      if (index === -1) { return false }
+      var time = secret.substr(index + 1, secret.length - index)
+      time = parseInt(time, 21)
+      return (new Date().getTime()) < time
+    }
+  }
+  return true
 }
 
 /**
