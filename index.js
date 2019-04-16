@@ -269,23 +269,13 @@ function setSecret (req, res, sessionKey, val, cookie) {
     var value = val
 
     if (cookie.signed) {
-      var secret = req.secret
-
-      if (!secret) {
-        /* istanbul ignore next: should never actually run */
-        throw new Error('misconfigured csrf')
-      }
-
-      value = 's:' + sign(val, secret)
+      value = 's:' + sign(val, req.secret)
     }
 
     setCookie(res, cookie.key, value, cookie)
-  } else if (req[sessionKey]) {
+  } else {
     // set secret on session
     req[sessionKey].csrfSecret = val
-  } else {
-    /* istanbul ignore next: should never actually run */
-    throw new Error('misconfigured csrf')
   }
 }
 
