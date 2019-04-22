@@ -26,8 +26,8 @@
     "eslint-plugin-node": "8.0.1",
     "eslint-plugin-promise": "4.1.1",
     "eslint-plugin-standard": "4.0.0",
-    "istanbul": "0.4.5",
     "mocha": "6.1.4",
+    "nyc": "14.0.0",
     "supertest": "4.0.2"
   },
   "engines": {
@@ -36,8 +36,8 @@
   "scripts": {
     "lint": "eslint --plugin markdown --ext js,md .",
     "test": "mocha --check-leaks --reporter spec --bail test/",
-    "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --check-leaks --reporter dot test/",
-    "test-travis": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --check-leaks --reporter spec test/"
+    "test-cov": "nyc --reporter=html --reporter=text npm test",
+    "test-travis": "nyc --reporter=text npm test"
   },
   "files": [
     "HISTORY.md",
