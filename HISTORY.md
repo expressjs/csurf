@@ -1,5 +1,5 @@
-unreleased
-==========
+1.10.0 / 2019-04-22
+===================
 
   * deps: csrf@3.1.0
     - Remove `base64-url` dependency
