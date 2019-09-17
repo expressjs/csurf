@@ -5,7 +5,7 @@
 [![Build status][travis-image]][travis-url]
 [![Test coverage][coveralls-image]][coveralls-url]
 
-Node.js [CSRF](https://en.wikipedia.org/wiki/Cross-site_request_forgery) protection middleware.
+Node.js [CSRF][wikipedia-csrf] protection middleware.
 
 Requires either a session middleware or [cookie-parser](https://www.npmjs.com/package/cookie-parser) to be initialized first.
 
@@ -52,7 +52,9 @@ any of the following keys:
 ##### cookie
 
 Determines if the token secret for the user should be stored in a cookie
-or in `req.session`. Defaults to `false`.
+or in `req.session`. Storing the token secret in a cookie implements
+the [double submit cookie pattern][owsap-csrf-double-submit].
+Defaults to `false`.
 
 When set to `true` (or an object of options for the cookie), then the module
 changes behavior and no longer uses `req.session`. This means you _are no
@@ -298,6 +300,15 @@ app.use(function (err, req, res, next) {
   res.send('form tampered with')
 })
 ```
+
+## References
+
+- [Cross-side request forgery on Wikipedia][wikipedia-csrf]
+- [OWASP Cross-Site Request Forgery Prevention Cheat Sheet][owsap-csrf]
+
+[owsap-csrf]: https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html
+[owsap-csrf-double-submit]: https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie
+[wikipedia-csrf]: https://en.wikipedia.org/wiki/Cross-site_request_forgery
 
 ## License
 
