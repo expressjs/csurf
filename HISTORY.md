@@ -1,6 +1,8 @@
 unreleased
 ==========
 
+  * deps: cookie@0.4.0
+    - Add `SameSite=None` support
   * deps: http-errors@~1.7.3
     - deps: inherits@2.0.4
 

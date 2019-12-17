@@ -77,8 +77,10 @@ following keys:
     (defaults to session length).
   - `httpOnly` - flags the cookie to be accessible only by the web server
     (defaults to `false`).
-  - `sameSite` - sets the same site policy for the cookie (defaults to none).
-  - `domain` - sets the domain the cookie is valid on (defaults to current
+  - `sameSite` - sets the same site policy for the cookie(defaults to
+    `false`). This can be set to `'strict'`, `'lax'`, `'none'`, or `true`
+    (which maps to `'strict'`).
+  - `domain` - sets the domain the cookie is valid on(defaults to current
     domain).
 
 ##### ignoreMethods
