@@ -1,5 +1,5 @@
-unreleased
-==========
+1.11.0 / 2020-01-18
+===================
 
   * deps: cookie@0.4.0
     - Add `SameSite=None` support
