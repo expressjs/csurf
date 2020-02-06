@@ -232,6 +232,68 @@ describe('csurf', function () {
               .expect(200, done)
           })
       })
+
+      it('should keep the same secret', function (done) {
+        var app = connect()
+
+        app.use(cookieParser('keyboard cat'))
+        app.use(csurf({ cookie: true }))
+        app.use(function (req, res, next) {
+          res.end(req.csrfToken())
+        })
+
+        var appRequest = request(app)
+
+        appRequest
+          .get('/')
+          .expect(200, function (err, res) {
+            if (err) return done(err)
+            var token = res.text
+
+            appRequest
+              .post('/')
+              .set('Cookie', cookies(res))
+              .set('X-CSRF-Token', token)
+              .expect(200, function (err, res) {
+                if (err) return done(err)
+
+                assert.strictEqual(res.headers['set-cookie'], undefined)
+                done()
+              })
+          })
+      })
+
+      it('should create a new secret', function (done) {
+        var app = connect()
+
+        app.use(cookieParser('keyboard cat'))
+        app.use(csurf({ cookie: true, regenSecret: true }))
+        app.use(function (req, res, next) {
+          res.end(req.csrfToken())
+        })
+
+        var appRequest = request(app)
+
+        appRequest
+          .get('/')
+          .expect(200, function (err, res) {
+            if (err) return done(err)
+            var firstSecret = cookie(res, '_csrf')
+            var token = res.text
+
+            appRequest
+              .post('/')
+              .set('Cookie', cookies(res))
+              .set('X-CSRF-Token', token)
+              .expect(200, function (err, res) {
+                if (err) return done(err)
+                var secondSecret = cookie(res, '_csrf')
+
+                assert.notStrictEqual(firstSecret, secondSecret)
+                done()
+              })
+          })
+      })
     })
 
     describe('when an object', function () {
