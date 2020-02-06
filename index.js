@@ -50,6 +50,9 @@ function csurf (options) {
   // get value getter
   var value = opts.value || defaultValue
 
+  // Should csrfToken regenerate the secret
+  var regenSecret = opts.regenSecret || false
+
   // token repo
   var tokens = new Tokens(opts)
 
@@ -87,7 +90,7 @@ function csurf (options) {
       }
 
       // generate & set new secret
-      if (sec === undefined) {
+      if (sec === undefined || regenSecret) {
         sec = tokens.secretSync()
         setSecret(req, res, sessionKey, sec, cookie)
       }
@@ -233,6 +236,28 @@ function getSecretBag (req, sessionKey, cookie) {
 }
 
 /**
+ * Remove values from cookie which match the name of the crsf value
+ *
+ * @param {Array|String} cookie current cookie values
+ * @param {string} name of the crsf value
+ * @return {Array} or cookie values with only one with the crsf name
+ * @api private
+ */
+function removePreviousCSRFCookie (cookie, name) {
+  var newCookie = []
+  if (typeof cookie === 'string' && !cookie.match(name)) {
+    newCookie = [cookie]
+  } else {
+    for (var i = 0; i < cookie.length; i++) {
+      if (!cookie[i].match(name)) {
+        newCookie.push(cookie[i])
+      }
+    }
+  }
+  return newCookie
+}
+
+/**
  * Set a cookie on the HTTP response.
  *
  * @param {OutgoingMessage} res
@@ -246,8 +271,8 @@ function setCookie (res, name, val, options) {
   var data = Cookie.serialize(name, val, options)
 
   var prev = res.getHeader('set-cookie') || []
-  var header = Array.isArray(prev) ? prev.concat(data)
-    : [prev, data]
+  prev = removePreviousCSRFCookie(prev, name)
+  var header = prev.concat(data)
 
   res.setHeader('set-cookie', header)
 }

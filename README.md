@@ -114,6 +114,13 @@ locations, in order:
   - `req.headers['x-csrf-token']` - the `X-CSRF-Token` HTTP request header.
   - `req.headers['x-xsrf-token']` - the `X-XSRF-Token` HTTP request header.
 
+##### regenSecret
+
+When set to true every call to `req.crsfToken()` will generate a new token
+and a new secret.
+
+Defaults to `false`.
+
 ## Example
 
 ### Simple express example
