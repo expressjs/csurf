@@ -101,14 +101,25 @@ function csurf (options) {
       return token
     }
 
+    var submitted
+
+    if (!ignoreMethod[req.method]) {
+      submitted = value(req)
+    }
+
     // generate & set secret
     if (!secret) {
+      if (submitted) {
+        return next(createError(403, 'no established csrf secret', {
+          code: 'ENOECSRFTOKEN'
+        }))
+      }
       secret = tokens.secretSync()
       setSecret(req, res, sessionKey, secret, cookie)
     }
 
     // verify the incoming token
-    if (!ignoreMethod[req.method] && !tokens.verify(secret, value(req))) {
+    if (!ignoreMethod[req.method] && !tokens.verify(secret, submitted)) {
       return next(createError(403, 'invalid csrf token', {
         code: 'EBADCSRFTOKEN'
       }))
