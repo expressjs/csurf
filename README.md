@@ -305,7 +305,7 @@ app.use(function (err, req, res, next) {
 
 ## References
 
-- [Cross-side request forgery on Wikipedia][wikipedia-csrf]
+- [Cross-site request forgery on Wikipedia][wikipedia-csrf]
 - [OWASP Cross-Site Request Forgery Prevention Cheat Sheet][owsap-csrf]
 
 [owsap-csrf]: https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html
