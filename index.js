@@ -17,7 +17,7 @@ var Cookie = require('cookie')
 var createError = require('http-errors')
 var sign = require('cookie-signature').sign
 var Tokens = require('csrf')
-
+var isInitialized = false
 /**
  * Module exports.
  * @public
@@ -39,6 +39,11 @@ module.exports = csurf
  */
 
 function csurf (options) {
+  if (isInitialized) {
+    throw new Error('csrf() is not allowed called than one time.')
+  }
+  isInitialized = true;
+
   var opts = options || {}
 
   // get cookie options
