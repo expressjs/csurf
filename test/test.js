@@ -468,6 +468,67 @@ describe('csurf', function () {
         .expect(500, /misconfigured csrf/, done)
     })
   })
+
+  describe('when repeatedly use csruf', function () {
+    it("should work when give the token in first csurf", function (done) {
+      var app = connect()
+      const csrfTokenProtection = csurf({ cookie: true })
+      app.use(cookieParser())
+      app.use(bodyParser.urlencoded({ extended: false }))
+      app.use(csurf({ cookie: true }))
+      app.use((req, res, next) => {
+        req.fisrtToken = req.csrfToken()
+        next()
+      })
+      app.use(csrfTokenProtection)
+      app.use((req, res) => {
+        // simulate the render ejs
+        res.end(JSON.stringify({token: req.fisrtToken}))
+      })
+
+      request(app)
+        .get('/')
+        .expect(200, function (err, res) {
+          if (err) return done(err)
+          const data = JSON.parse(res.text)
+
+          // simulate the express behavior
+          const cookie = cookies(res).split(";")
+          const lastCsrfToken = cookie[cookie.length - 1]
+
+          request(app)
+            .post('/')
+            .set('Cookie', lastCsrfToken)
+            .set('X-CSRF-Token', data.token)
+            .expect(200, done)
+        })
+    })
+
+    it("should work when give the token in second csurf", function (done) {
+      var app = connect()
+      const csrfTokenProtection = csurf({ cookie: true })
+      app.use(cookieParser())
+      app.use(bodyParser.urlencoded({ extended: false }))
+      app.use(csurf({ cookie: true }))
+      app.use(csrfTokenProtection)
+      app.use((req, res) => {
+        // simulate the render ejs
+        res.end(JSON.stringify({token: req.csrfToken()}))
+      })
+
+      request(app)
+        .get('/')
+        .expect(200, function (err, res) {
+          if (err) return done(err)
+          const data = JSON.parse(res.text)
+          request(app)
+            .post('/')
+            .set('Cookie', cookies(res))
+            .set('X-CSRF-Token', data.token)
+            .expect(200, done)
+        })
+    })
+  })
 })
 
 function cookie (res, name) {

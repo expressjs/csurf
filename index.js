@@ -72,13 +72,13 @@ function csurf (options) {
     }
 
     // get the secret from the request
-    var secret = getSecret(req, sessionKey, cookie)
+    var secret = getSecret(req, res, sessionKey, cookie)
     var token
 
     // lazy-load token getter
     req.csrfToken = function csrfToken () {
       var sec = !cookie
-        ? getSecret(req, sessionKey, cookie)
+        ? getSecret(req, res, sessionKey, cookie)
         : secret
 
       // use cached token if secret has not changed
@@ -191,12 +191,13 @@ function getIgnoredMethods (methods) {
  * Get the token secret from the request.
  *
  * @param {IncomingMessage} req
+ * @param {OutcomingMessage} res
  * @param {String} sessionKey
  * @param {Object} [cookie]
  * @api private
  */
 
-function getSecret (req, sessionKey, cookie) {
+function getSecret (req, res, sessionKey, cookie) {
   // get the bag & key
   var bag = getSecretBag(req, sessionKey, cookie)
   var key = cookie ? cookie.key : 'csrfSecret'
@@ -205,8 +206,14 @@ function getSecret (req, sessionKey, cookie) {
     throw new Error('misconfigured csrf')
   }
 
+  var bagSecret = bag[key]
+
+  if (cookie && !bagSecret) {
+    return getSecertFromSetCookieHeader(res, cookie)
+  }
+
   // return secret from bag
-  return bag[key]
+  return bagSecret
 }
 
 /**
@@ -250,6 +257,32 @@ function setCookie (res, name, val, options) {
     : [prev, data]
 
   res.setHeader('set-cookie', header)
+}
+
+/**
+ * Get secrect from set-cookie header in HTTP response.
+ *
+ * @param {OutgoingMessage} res
+ * @param {Object} [cookie]
+ * @api private
+ */
+
+function getSecertFromSetCookieHeader (res, cookie) {
+  let setCookieHeaders = res.getHeader("set-cookie")
+  if (setCookieHeaders) {
+    for (let setCookieHeader of setCookieHeaders) {
+      setCookieHeader = Cookie.parse(setCookieHeader)
+      if (cookie.Path !== setCookieHeader.path) {
+        continue;
+      }
+      if (!cookie.Domain) {
+        return setCookieHeader[cookie.key]
+      }
+      if (cookie.Domain && cookie.Domain === setCookieHeader.domain) {
+        return setCookieHeader[cookie.key]
+      }
+    }
+  }
 }
 
 /**
