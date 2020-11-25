@@ -66,6 +66,14 @@ function csurf (options) {
   var ignoreMethod = getIgnoredMethods(ignoreMethods)
 
   return function csrf (req, res, next) {
+    if (req.isInitialized) {
+      console.warn("[Warning] csurf() duplicated called with same middleware in the cooke mode")
+    }
+      
+    if (!req.isInitialized && cookie) {
+      req.isInitialized = true
+    }
+
     // validate the configuration against request
     if (!verifyConfiguration(req, sessionKey, cookie)) {
       return next(new Error('misconfigured csrf'))
