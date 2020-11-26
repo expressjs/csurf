@@ -67,9 +67,9 @@ function csurf (options) {
 
   return function csrf (req, res, next) {
     if (req.isInitialized) {
-      console.warn("[Warning] csurf() is duplicately called with same middleware in the cooke mode, first validation will result in the invalid token.")
+      console.warn('[Warning] csurf() is duplicately called with same middleware in the cooke mode, first validation will result in the invalid token.')
     }
-      
+
     if (!req.isInitialized && cookie) {
       req.isInitialized = true
     }
