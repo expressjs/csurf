@@ -67,7 +67,7 @@ function csurf (options) {
 
   // generate lookup
   var ignoreMethod = getIgnoredMethods(ignoreMethods)
-  
+
   return function csrf (req, res, next) {
     // validate the configuration against request
     if (!verifyConfiguration(req, sessionKey, cookie)) {
