@@ -52,6 +52,9 @@ function csurf (options) {
 
   // token repo
   var tokens = new Tokens(opts)
+  
+  // cached token
+  var token
 
   // ignored methods
   var ignoreMethods = opts.ignoreMethods === undefined
@@ -64,7 +67,7 @@ function csurf (options) {
 
   // generate lookup
   var ignoreMethod = getIgnoredMethods(ignoreMethods)
-
+  
   return function csrf (req, res, next) {
     // validate the configuration against request
     if (!verifyConfiguration(req, sessionKey, cookie)) {
@@ -73,7 +76,6 @@ function csurf (options) {
 
     // get the secret from the request
     var secret = getSecret(req, sessionKey, cookie)
-    var token
 
     // lazy-load token getter
     req.csrfToken = function csrfToken () {
