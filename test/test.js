@@ -232,6 +232,20 @@ describe('csurf', function () {
               .expect(200, done)
           })
       })
+
+      it('should return error when call csurf twice in middleware.', function (done) {
+        var app = connect()
+        app.use(cookieParser('keyboard cat'))
+        app.use(csurf({ cookie: true }))
+        app.use(csurf({ cookie: true }))
+        app.use(function (req, res) {
+          res.end(req.csrfToken() || 'none')
+        })
+
+        request(app)
+          .get('/')
+          .expect(500, /csurf\({cookie: true}\) or csurf\({cookie: {}}}\) is repeatedly called with same middleware in the cooke mode, first validation will result in the invalid token/, done)
+      })
     })
 
     describe('when an object', function () {
