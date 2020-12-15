@@ -66,14 +66,8 @@ function csurf (options) {
   var ignoreMethod = getIgnoredMethods(ignoreMethods)
 
   return function csrf (req, res, next) {
-    if (cookie) {
-      if (csurfInitialization.getStatus(req)) {
-        return next(new Error('csurf({cookie: true}) or csurf({cookie: {}}}) is repeatedly called with same middleware in the cooke mode, first validation will result in the invalid token'))
-      }
-
-      if (!csurfInitialization.getStatus(req)) {
-        csurfInitialization.setStatus(req, true)
-      }
+    if (verifyCsurfIsInitializedRepeatedly(req, cookie)) {
+      return next(new Error('csurf({cookie: true}) or csurf({cookie: {}}}) is repeatedly called with same middleware in the cooke mode, first validation will result in the invalid token'))
     }
 
     // validate the configuration against request
@@ -307,38 +301,22 @@ function verifyConfiguration (req, sessionKey, cookie) {
 }
 
 /**
- * Manipulate csurf initialization status.
- * This variable is only used in cookie mode.
- * @private
+ * Check csurf initialization status.
+ * This function is only used in cookie mode.
+ * @param {IncomingMessage} req
+ * @param {Object} cookie
+ * @returns {boolean} csurf is initializaed repeatedly or not in cookie mode.
+ * @api private
  */
 
-var csurfInitialization = {
-  /**
-   * @private
-   */
-
-  _name: '@@isCsurfInitialized@@',
-
-  /**
-   * Get csurf initialization status
-   * @param {IncomingMessage} req
-   * @returns {boolean} Csurf is initializaed or not.
-   * @private
-   */
-
-  getStatus: function (req) {
-    return req[this._name]
-  },
-
-  /**
-   * Get csurf initialization status
-   * @param {IncomingMessage} req
-   * @param {boolean} isInitialized
-   * @returns {void}
-   * @private
-   */
-
-  setStatus: function (req, isInitialized) {
-    req[this._name] = isInitialized
+function verifyCsurfIsInitializedRepeatedly (req, cookie) {
+  if (!cookie) {
+    return false
   }
+  var _name = '@@isCsurfInitialized@@'
+  if (!req[_name]) {
+    req[_name] = true
+    return false
+  }
+  return true
 }
