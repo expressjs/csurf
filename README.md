@@ -233,8 +233,8 @@ that you expect to only come from your website. An existing session, even if
 it belongs to an authenticated user, is not enough to protect against CSRF
 attacks.
 
-The following is an example of how to order your routes so that certain endpoints
-do not check for a valid CSRF token.
+The following is an example of how to use generate/verify middlewares to ignore
+some routes.
 
 ```js
 var cookieParser = require('cookie-parser')
@@ -245,23 +245,26 @@ var express = require('express')
 // create express app
 var app = express()
 
+// initialize csrf middleware
+var _csrf = csrf({ cookie: true })
+
 // create api router
 var api = createApiRouter()
 
-// mount api before csrf is appended to the app stack
-app.use('/api', api)
-
-// now add csrf and other middlewares, after the "/api" was mounted
+// now add csrf generate and other middlewares
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
-app.use(csrf({ cookie: true }))
+app.use(_csrf.generate())
+
+// mount api without csrf verify middleware
+app.use('/api', api)
 
 app.get('/form', function (req, res) {
   // pass the csrfToken to the view
   res.render('send', { csrfToken: req.csrfToken() })
 })
 
-app.post('/process', function (req, res) {
+app.post('/process', _csrf.verify(), function (req, res) {
   res.send('csrf was required to get here')
 })
 
