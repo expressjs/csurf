@@ -188,11 +188,11 @@ function buildOptions (options) {
   var tokens = new Tokens(opts)
 
   return {
-    cookie,
-    sessionKey,
-    value,
-    ignoreMethods,
-    tokens
+    cookie: cookie,
+    sessionKey: sessionKey,
+    value: value,
+    ignoreMethods: ignoreMethods,
+    tokens: tokens
   }
 }
 
