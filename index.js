@@ -62,6 +62,15 @@ function csurf (options) {
     throw new TypeError('option ignoreMethods must be an array')
   }
 
+  // ignored routes
+  var ignoreRoutes = opts.ignoreRoutes === undefined
+    ? []
+    : opts.ignoreRoutes
+
+  if (!Array.isArray(ignoreRoutes)) {
+    throw new TypeError('option ignoreRoutes must be an array')
+  }
+
   // generate lookup
   var ignoreMethod = getIgnoredMethods(ignoreMethods)
 
@@ -108,6 +117,12 @@ function csurf (options) {
     }
 
     // verify the incoming token
+    if (ignoreRoutes && ignoreRoutes.length > 0 && !isIgnoredRoute(req, ignoreRoutes) && !tokens.verify(secret, value(req))) {
+      return next(createError(403, 'invalid csrf token', {
+        code: 'EBADCSRFTOKEN'
+      }))
+    }
+
     if (!ignoreMethod[req.method] && !tokens.verify(secret, value(req))) {
       return next(createError(403, 'invalid csrf token', {
         code: 'EBADCSRFTOKEN'
@@ -294,4 +309,10 @@ function verifyConfiguration (req, sessionKey, cookie) {
   }
 
   return true
+}
+
+function isIgnoredRoute (req, ignoreRoutes) {
+  var parseUrl = require('parseurl')
+  var pathname = parseUrl(req).pathname
+  return ignoreRoutes.includes(pathname)
 }

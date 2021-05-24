@@ -468,6 +468,30 @@ describe('csurf', function () {
         .expect(500, /misconfigured csrf/, done)
     })
   })
+
+  describe('with "ignoreRoutes" option', function () {
+    it('should work in req.body', function (done) {
+      var server = createServer({ ignoreRoutes: ['/', '/sample/put'] })
+
+      request(server)
+        .get('/')
+        .expect(200, function (err, res) {
+          if (err) return done(err)
+          var token = res.text
+
+          request(server)
+            .post('/sample/post')
+            .set('Cookie', cookies(res))
+            .set('csrf-token', token)
+            .expect(200, function (err, res) {
+              if (err) return done(err)
+              request(server)
+                .put('/sample/put')
+                .expect(403, done)
+            })
+        })
+    })
+  })
 })
 
 function cookie (res, name) {
