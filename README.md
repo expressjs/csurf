@@ -72,7 +72,8 @@ following keys:
   - `path` - the path of the cookie (defaults to `'/'`).
   - `signed` - indicates if the cookie should be signed (defaults to `false`).
   - `secure` - marks the cookie to be used with HTTPS only (defaults to
-    `false`).
+    `false`). If set to ``'auto'`, HTTPS will be detected via the `x-forwarded-proto`
+    header, similar to [express-session](https://expressjs.com/en/resources/middleware/session.html#cookiesecure).
   - `maxAge` - the number of seconds after which the cookie will expire
     (defaults to session length).
   - `httpOnly` - flags the cookie to be accessible only by the web server

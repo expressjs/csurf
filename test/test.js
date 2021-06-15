@@ -320,6 +320,115 @@ describe('csurf', function () {
             .expect(500, /misconfigured csrf/, done)
         })
       })
+
+      describe('when "secure": true', function () {
+        it('should add Secure', function (done) {
+          var server = createServer({ cookie: { secure: true } })
+
+          request(server)
+            .get('/')
+            .expect(200, function (err, res) {
+              if (err) return done(err)
+              var data = cookie(res, '_csrf')
+              var token = res.text
+
+              assert.ok(Boolean(data))
+              assert.ok(/^_csrf=[\w-_]+/i.test(data))
+              assert.ok(/Secure/.test(data))
+
+              request(server)
+                .post('/')
+                .set('Cookie', cookies(res))
+                .set('X-CSRF-Token', token)
+                .expect(200, done)
+            })
+        })
+      })
+
+      describe('when "secure": "auto"', function () {
+        it('should add Secure when x-forwarded-proto: "https"', function (done) {
+          var server = createServer({ cookie: { secure: 'auto' } })
+
+          request(server)
+            .get('/')
+            .set('x-forwarded-proto', 'https')
+            .expect(200, function (err, res) {
+              if (err) return done(err)
+              var data = cookie(res, '_csrf')
+
+              assert.ok(Boolean(data))
+              assert.ok(/^_csrf=[\w-_]+/i.test(data))
+              assert.ok(/Secure/.test(data))
+
+              done()
+            })
+        })
+
+        it('should not add Secure for http', function (done) {
+          var server = createServer({ cookie: { secure: 'auto' } })
+
+          request(server)
+            .get('/')
+            .set('x-forwarded-proto', 'http')
+            .expect(200, function (err, res) {
+              if (err) return done(err)
+              var data = cookie(res, '_csrf')
+
+              assert.ok(Boolean(data))
+              assert.ok(/^_csrf=[\w-_]+/i.test(data))
+              assert.equal(/Secure/.test(data), false)
+
+              done()
+            })
+        })
+
+        it('should not add Secure otherwise', function (done) {
+          var server = createServer({ cookie: { secure: 'auto' } })
+
+          request(server)
+            .get('/')
+            .expect(200, function (err, res) {
+              if (err) return done(err)
+              var data = cookie(res, '_csrf')
+
+              assert.ok(Boolean(data))
+              assert.ok(/^_csrf=[\w-_]+/i.test(data))
+              assert.equal(/Secure/.test(data), false)
+
+              done()
+            })
+        })
+
+        it('setting is not sticky and can change between requests', function (done) {
+          var server = createServer({ cookie: { secure: 'auto' } })
+
+          request(server)
+            .get('/')
+            .set('x-forwarded-proto', 'https')
+            .expect(200, function (err, res) {
+              if (err) return done(err)
+              var data = cookie(res, '_csrf')
+
+              assert.ok(Boolean(data))
+              assert.ok(/^_csrf=[\w-_]+/i.test(data))
+              assert.ok(/Secure/.test(data))
+
+              // Note header not present
+              request(server)
+                .get('/')
+                .expect(200, function (err, res) {
+                  if (err) return done(err)
+                  var data = cookie(res, '_csrf')
+
+                  assert.ok(Boolean(data))
+                  assert.ok(/^_csrf=[\w-_]+/i.test(data))
+                  assert.equal(/Secure/.test(data), false)
+
+                  done()
+                })
+            })
+        })
+      })
     })
   })
 
