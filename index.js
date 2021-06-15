@@ -235,6 +235,7 @@ function getSecretBag (req, sessionKey, cookie) {
 /**
  * Set a cookie on the HTTP response.
  *
+ * @param {IncomingMessage} req
  * @param {OutgoingMessage} res
  * @param {string} name
  * @param {string} val
@@ -242,7 +243,14 @@ function getSecretBag (req, sessionKey, cookie) {
  * @api private
  */
 
-function setCookie (res, name, val, options) {
+function setCookie (req, res, name, val, options) {
+  // Set by most proxies, allows us to auto-detect if we should set 'secure'
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Proto
+  if (options.secure === 'auto') {
+    var isSecure = Boolean(req.headers &&
+      req.headers['x-forwarded-proto'] === 'https');
+    options = Object.assign({}, options, {secure: isSecure})
+  }
   var data = Cookie.serialize(name, val, options)
 
   var prev = res.getHeader('set-cookie') || []
@@ -272,7 +280,7 @@ function setSecret (req, res, sessionKey, val, cookie) {
       value = 's:' + sign(val, req.secret)
     }
 
-    setCookie(res, cookie.key, value, cookie)
+    setCookie(req, res, cookie.key, value, cookie)
   } else {
     // set secret on session
     req[sessionKey].csrfSecret = val
