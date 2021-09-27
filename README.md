@@ -2,7 +2,7 @@
 
 [![NPM Version][npm-version-image]][npm-url]
 [![NPM Downloads][npm-downloads-image]][node-url]
-[![Build status][travis-image]][travis-url]
+[![Build status][github-actions-ci-image]][github-actions-ci-url]
 [![Test coverage][coveralls-image]][coveralls-url]
 
 Node.js [CSRF][wikipedia-csrf] protection middleware.
@@ -322,5 +322,5 @@ app.use(function (err, req, res, next) {
 [npm-downloads-image]: https://badgen.net/npm/dm/csurf
 [npm-url]: https://npmjs.org/package/csurf
 [npm-version-image]: https://badgen.net/npm/v/csurf
-[travis-image]: https://badgen.net/travis/expressjs/csurf/master
-[travis-url]: https://travis-ci.org/expressjs/csurf
+[github-actions-ci-image]: https://badgen.net/github/checks/expressjs/csurf/master?label=ci
+[github-actions-ci-url]: https://github.com/expressjs/csurf/actions/workflows/ci.yml
