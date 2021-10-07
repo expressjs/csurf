@@ -1,3 +1,9 @@
+unreleased
+==========
+
+  * deps: cookie@0.4.1
+    - Fix `maxAge` option to reject invalid values
+
 1.11.0 / 2020-01-18
 ===================
 
