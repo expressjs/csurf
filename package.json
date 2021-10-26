@@ -22,7 +22,7 @@
     "eslint": "7.32.0",
     "eslint-config-standard": "14.1.1",
     "eslint-plugin-import": "2.24.2",
-    "eslint-plugin-markdown": "1.0.2",
+    "eslint-plugin-markdown": "2.2.1",
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-promise": "4.3.1",
     "eslint-plugin-standard": "4.1.0",
@@ -34,7 +34,7 @@
     "node": ">= 0.8.0"
   },
   "scripts": {
-    "lint": "eslint --plugin markdown --ext js,md .",
+    "lint": "eslint .",
     "test": "mocha --check-leaks --reporter spec --bail test/",
     "test-ci": "nyc --reporter=lcovonly --reporter=text npm test",
     "test-cov": "nyc --reporter=html --reporter=text npm test"

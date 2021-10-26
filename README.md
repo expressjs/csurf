@@ -31,8 +31,6 @@ $ npm install csurf
 
 ## API
 
-<!-- eslint-disable no-unused-vars -->
-
 ```js
 var csurf = require('csurf')
 ```
@@ -215,8 +213,6 @@ renders the page (where `res.render` or `res.sendFile` is called in Express,
 for example).
 
 The following is an example for Express of a typical SPA response:
-
-<!-- eslint-disable no-undef -->
 
 ```js
 app.all('*', function (req, res) {
