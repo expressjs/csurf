@@ -3,6 +3,8 @@ unreleased
 
   * deps: cookie@0.4.1
     - Fix `maxAge` option to reject invalid values
+  * deps: http-errors@1.8.0
+    - deps: setprototypeof@1.2.0
 
 1.11.0 / 2020-01-18
 ===================
