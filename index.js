@@ -66,6 +66,10 @@ function csurf (options) {
   var ignoreMethod = getIgnoredMethods(ignoreMethods)
 
   return function csrf (req, res, next) {
+    if (verifyCsurfIsInitializedRepeatedly(req, cookie)) {
+      return next(new Error('csurf({cookie: true}) or csurf({cookie: {}}}) is repeatedly called with same middleware in the cooke mode, first validation will result in the invalid token'))
+    }
+
     // validate the configuration against request
     if (!verifyConfiguration(req, sessionKey, cookie)) {
       return next(new Error('misconfigured csrf'))
@@ -293,5 +297,26 @@ function verifyConfiguration (req, sessionKey, cookie) {
     return false
   }
 
+  return true
+}
+
+/**
+ * Check csurf initialization status.
+ * This function is only used in cookie mode.
+ * @param {IncomingMessage} req
+ * @param {Object} cookie
+ * @returns {boolean} csurf is initializaed repeatedly or not in cookie mode.
+ * @api private
+ */
+
+function verifyCsurfIsInitializedRepeatedly (req, cookie) {
+  if (!cookie) {
+    return false
+  }
+  var _name = '@@isCsurfInitialized@@'
+  if (!req[_name]) {
+    req[_name] = true
+    return false
+  }
   return true
 }
