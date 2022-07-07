@@ -468,6 +468,52 @@ describe('csurf', function () {
         .expect(500, /misconfigured csrf/, done)
     })
   })
+
+  describe('expose generate/verify middlewares', function () {
+    var app
+    before(function () {
+      var _csurf = csurf()
+      app = connect()
+      app.use(session({ keys: ['a', 'b'] }))
+      app.use(_csurf.generate())
+      app.use('/open', function (req, res, next) {
+        next()
+      })
+      app.use('/api', _csurf.verify(), function (req, res, next) {
+        req.session = { hit: 1 }
+        next()
+      })
+      app.use(function (req, res) {
+        res.end(req.csrfToken() || 'none')
+      })
+    })
+
+    it('should work with a valid token on protected route', function (done) {
+      request(app)
+        .get('/')
+        .expect(200, function (err, res) {
+          if (err) return done(err)
+          var token = res.text
+          request(app)
+            .post('/api')
+            .set('Cookie', cookies(res))
+            .set('X-CSRF-Token', token)
+            .expect(200, done)
+        })
+    })
+
+    it('should allow request to unprotected route without token', function (done) {
+      request(app)
+        .post('/open')
+        .expect(200, done)
+    })
+
+    it('should error if token missing for protected route', function (done) {
+      request(app)
+        .post('/api')
+        .expect(403, done)
+    })
+  })
 })
 
 function cookie (res, name) {
