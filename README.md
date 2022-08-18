@@ -7,7 +7,9 @@
 
 Node.js [CSRF][wikipedia-csrf] protection middleware.
 
-Requires either a session middleware or [cookie-parser](https://www.npmjs.com/package/cookie-parser) to be initialized first.
+If not using stateless CSRF token patterns ([HMAC based token pattern][owasp-csrf-hmac-based-token] or 
+[Encryption based token pattern][owasp-csrf-encryption-based-token]), it requires either a session middleware 
+or [cookie-parser](https://www.npmjs.com/package/cookie-parser) to be initialized first.
 
   * If you are setting the ["cookie" option](#cookie) to a non-`false` value,
     then you must use [cookie-parser](https://www.npmjs.com/package/cookie-parser)
@@ -40,19 +42,31 @@ var csurf = require('csurf')
 Create a middleware for CSRF token creation and validation. This middleware
 adds a `req.csrfToken()` function to make a token which should be added to
 requests which mutate state, within a hidden form field, query-string etc.
-This token is validated against the visitor's session or csrf cookie.
 
 #### Options
 
 The `csurf` function takes an optional `options` object that may contain
 any of the following keys:
 
+##### csrfTokenPattern
+
+Determines the CSRF token pattern to use.
+Pass `hmac` for [HMAC based token pattern][owasp-csrf-hmac-based-token].
+Pass `encrypted` for [Encryption based token pattern][owasp-csrf-encryption-based-token]
+Defaults to [double submit cookie pattern][owsap-csrf-double-submit].
+
+NOTE: In case of HMAC based token pattern, 
+`req._csrfUserId`, `req._csrfNonce` and `req._csrfOperation` are used to generate the token. Also, `req._csrfUserId` 
+is used for verifying the token value.
+
+NOTE: In case of Encryption based token pattern, 
+`req._csrfUserId` and `req._csrfNonce` are used to generate the token. Also, `req._csrfUserId` 
+is used for verifying the token value.
+
 ##### cookie
 
 Determines if the token secret for the user should be stored in a cookie
-or in `req.session`. Storing the token secret in a cookie implements
-the [double submit cookie pattern][owsap-csrf-double-submit].
-Defaults to `false`.
+or in `req.session`. Defaults to `false`. This option makes no difference in case `csrfTokenPattern` is `hmac` or `encrypted`.
 
 When set to `true` (or an object of options for the cookie), then the module
 changes behavior and no longer uses `req.session`. This means you _are no
@@ -93,7 +107,7 @@ Defaults to `'session'` (i.e. looks at `req.session`). The CSRF secret
 from this library is stored and read as `req[sessionKey].csrfSecret`.
 
 If the ["cookie" option](#cookie) is not `false`, then this option does
-nothing.
+nothing. This option makes no difference in case `csrfTokenPattern` is `hmac` or `encrypted`.
 
 ##### value
 
@@ -111,6 +125,18 @@ locations, in order:
   - `req.headers['xsrf-token']` - the `XSRF-Token` HTTP request header.
   - `req.headers['x-csrf-token']` - the `X-CSRF-Token` HTTP request header.
   - `req.headers['x-xsrf-token']` - the `X-XSRF-Token` HTTP request header.
+
+##### hmacSecret
+
+Applicable only if `csrfTokenPattern` is `hmac`. This is secret known only to the server and is used in the HMAC algorithm.
+
+##### encryptionKey
+
+Applicable only if `csrfTokenPattern` is `encrypted`. This is secret key known only to the server and is used in the Encryption algorithm (aes-256-cbc).
+
+##### expiry
+
+Applicable only if `csrfTokenPattern` is `hmac` or `encrypted`. This is the token expiry in seconds. Expired tokens are rejected.
 
 ## Example
 
@@ -306,6 +332,8 @@ app.use(function (err, req, res, next) {
 
 [owsap-csrf]: https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html
 [owsap-csrf-double-submit]: https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie
+[owasp-csrf-hmac-based-token]: https://owasp.deteact.com/cheat/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#hmac-based-token-pattern
+[owasp-csrf-encryption-based-token]: https://owasp.deteact.com/cheat/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#encryption-based-token-pattern
 [wikipedia-csrf]: https://en.wikipedia.org/wiki/Cross-site_request_forgery
 
 ## License
