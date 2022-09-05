@@ -16,7 +16,7 @@
 var Cookie = require('cookie')
 var createError = require('http-errors')
 var sign = require('cookie-signature').sign
-var Tokens = require('csrf')
+var TokenManagerFactory = require('./tokenManager/Factory')
 
 /**
  * Module exports.
@@ -50,8 +50,10 @@ function csurf (options) {
   // get value getter
   var value = opts.value || defaultValue
 
+  var isStatelessPattern = opts.csrfTokenPattern === 'hmac' || opts.csrfTokenPattern === 'encrypted'
+
   // token repo
-  var tokens = new Tokens(opts)
+  var tokenManager = new TokenManagerFactory(opts).getTokenManager()
 
   // ignored methods
   var ignoreMethods = opts.ignoreMethods === undefined
@@ -66,18 +68,21 @@ function csurf (options) {
   var ignoreMethod = getIgnoredMethods(ignoreMethods)
 
   return function csrf (req, res, next) {
-    // validate the configuration against request
-    if (!verifyConfiguration(req, sessionKey, cookie)) {
-      return next(new Error('misconfigured csrf'))
-    }
+    var token, secret
 
-    // get the secret from the request
-    var secret = getSecret(req, sessionKey, cookie)
-    var token
+    if (!isStatelessPattern) {
+      // validate the configuration against request
+      if (!verifyConfiguration(req, sessionKey, cookie)) {
+        return next(new Error('misconfigured csrf'))
+      }
+
+      // get the secret from the request
+      secret = getSecret(req, sessionKey, cookie)
+    }
 
     // lazy-load token getter
     req.csrfToken = function csrfToken () {
-      var sec = !cookie
+      var sec = !cookie && !isStatelessPattern
         ? getSecret(req, sessionKey, cookie)
         : secret
 
@@ -87,8 +92,8 @@ function csurf (options) {
       }
 
       // generate & set new secret
-      if (sec === undefined) {
-        sec = tokens.secretSync()
+      if (sec === undefined && !isStatelessPattern) {
+        sec = tokenManager.secretSync()
         setSecret(req, res, sessionKey, sec, cookie)
       }
 
@@ -96,19 +101,19 @@ function csurf (options) {
       secret = sec
 
       // create new token
-      token = tokens.create(secret)
+      token = tokenManager.create(secret, req)
 
       return token
     }
 
     // generate & set secret
-    if (!secret) {
-      secret = tokens.secretSync()
+    if (!secret && !isStatelessPattern) {
+      secret = tokenManager.secretSync()
       setSecret(req, res, sessionKey, secret, cookie)
     }
 
     // verify the incoming token
-    if (!ignoreMethod[req.method] && !tokens.verify(secret, value(req))) {
+    if (!ignoreMethod[req.method] && !tokenManager.verify(secret, value(req), req)) {
       return next(createError(403, 'invalid csrf token', {
         code: 'EBADCSRFTOKEN'
       }))

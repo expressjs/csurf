@@ -5,6 +5,7 @@ unreleased
     - Fix `maxAge` option to reject invalid values
   * deps: http-errors@1.8.0
     - deps: setprototypeof@1.2.0
+  * Allow selection of `csrfTokenPattern`. Support for HMAC based token pattern and encryption based token pattern added. Defaults to double submit cookie pattern.
 
 1.11.0 / 2020-01-18
 ===================
