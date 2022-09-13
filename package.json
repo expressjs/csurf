@@ -8,42 +8,6 @@
   ],
   "license": "MIT",
   "repository": "expressjs/csurf",
-  "dependencies": {
-    "cookie": "0.4.1",
-    "cookie-signature": "1.0.6",
-    "csrf": "3.1.0",
-    "http-errors": "1.8.0"
-  },
-  "devDependencies": {
-    "body-parser": "1.19.0",
-    "connect": "3.7.0",
-    "cookie-parser": "1.4.6",
-    "cookie-session": "1.4.0",
-    "eslint": "7.32.0",
-    "eslint-config-standard": "14.1.1",
-    "eslint-plugin-import": "2.25.3",
-    "eslint-plugin-markdown": "2.2.1",
-    "eslint-plugin-node": "11.1.0",
-    "eslint-plugin-promise": "4.3.1",
-    "eslint-plugin-standard": "4.1.0",
-    "mocha": "8.2.1",
-    "nyc": "15.1.0",
-    "supertest": "4.0.2"
-  },
-  "engines": {
-    "node": ">= 0.8.0"
-  },
-  "scripts": {
-    "lint": "eslint .",
-    "test": "mocha --check-leaks --reporter spec --bail test/",
-    "test-ci": "nyc --reporter=lcovonly --reporter=text npm test",
-    "test-cov": "nyc --reporter=html --reporter=text npm test"
-  },
-  "files": [
-    "HISTORY.md",
-    "LICENSE",
-    "index.js"
-  ],
   "keywords": [
     "csrf",
     "tokens",
